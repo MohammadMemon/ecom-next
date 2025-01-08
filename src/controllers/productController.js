@@ -62,15 +62,17 @@ export const getAllProducts = async (queryParams) => {
     // Get the total count of all products in the database
     const productsCount = await Product.countDocuments();
 
+    const start = performance.now();
     // Initialize our API features with the product query and search parameters
     const apiFeature = new ApiFeatures(Product.find(), queryParams)
       .search()    // Apply search functionality
       .filter()    // Apply filters (price, category, etc.)
       .pagination(resultPerPage);  // Apply pagination
-
-    // Execute the query after all features have been applied
-    const products = await apiFeature.query;
-
+    
+      // Execute the query after all features have been applied
+      const products = await apiFeature.query;
+      console.log(`DB Query Time: ${performance.now() - start}ms`);
+      
     // Return successful response with all necessary data
     return {
       success: true,

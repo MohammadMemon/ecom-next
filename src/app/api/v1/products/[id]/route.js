@@ -8,7 +8,7 @@ export async function GET(req, { params }) {
       await dbConnect();
   
       // Extract product ID from params
-      const { id } = params;
+      const { id } =  await params;
   
       // Fetch product details
       const result = await getProductDetails(id);

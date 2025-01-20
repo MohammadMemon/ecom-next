@@ -1,8 +1,35 @@
+'use client'
+import { createClient } from "@/utils/supabase/client";
+import { useState } from "react";
+
 export default function Home() {
+
+  const [loading, setLoading] = useState(false);
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      const supabase = await createClient()
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error logging out:", error);
+      } else {
+        window.location.href = "/"; // Redirect to home after logout
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-      
+      <form onSubmit={(e) => { e.preventDefault(); logout(); }}>
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging out..." : "Logout"}
+          </button>
+        </form>
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2">
             Get started by editing{" "}

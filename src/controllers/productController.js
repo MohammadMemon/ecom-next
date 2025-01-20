@@ -1,6 +1,12 @@
 import Product from '../models/productModel';
 import ApiFeatures from "../utils/apifeatures.js";
-// const cloudinary = require("cloudinary");
+import cloudinary from 'cloudinary';
+
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export const  catchAsyncErrors = (theFunc) => async (request, context) => {
   try {
@@ -17,42 +23,127 @@ export const  catchAsyncErrors = (theFunc) => async (request, context) => {
 };
 
 // Create Product -- Admin
-// export const createProduct = catchAsyncErrors(async (req, res, next) => {
-// let images = [];
+// export const createProduct = async (body) => {
+//   try {
+//     let images = [];
+    
+//     // Handle single image or array of images
+//     if (typeof body.images === "string") {
+//       images.push(body.images);
+//     } else {
+//       images = body.images || [];
+//     }
 
-// if (typeof req.body.images === "string") {
-// images.push(req.body.images);
-// } else {
-// images = req.body.images;
-// }
+//     const imagesLinks = [];
 
-// const imagesLinks = [];
+//     // Upload images one by one
+//     for (let i = 0; i < images.length; i++) {
+//       try {
+//         const result = await cloudinary.v2.uploader.upload(images[i], {
+//           folder: "products",
+//         });
 
-// for (let i = 0; i < images.length; i++) {
-// const result = await cloudinary.v2.uploader.upload(images[i], {
-//   folder: "products",
-// });
+//         imagesLinks.push({
+//           public_id: result.public_id,
+//           url: result.secure_url,
+//         });
+//       } catch (uploadError) {
+//         console.error("Upload error:", uploadError);
+//         throw new Error(`Failed to upload image: ${uploadError.message}`);
+//       }
+//     }
 
-// imagesLinks.push({
-//   public_id: result.public_id,
-//   url: result.secure_url,
-// });
-// }
+//     // Create the product
+//     const product = await Product.create({
+//       ...body,
+//       images: imagesLinks,
+//     });
 
-// req.body.images = imagesLinks;
-// req.body.user = req.user.id;
+//     return {
+//       success: true,
+//       product,
+//       statusCode: 201
+//     };
 
-// const product = await Product.create(req.body);
+//   } catch (error) {
+//     console.error("Error in createProduct:", error);
+    
+//     if (error.name === "ValidationError") {
+//       return {
+//         success: false,
+//         message: error.message,
+//         statusCode: 400
+//       };
+//     }
 
-// res.status(201).json({
-// success: true,
-// product,
-// });
-// });
+//     return {
+//       success: false,
+//       message: "Failed to create product",
+//       statusCode: 500
+//     };
+//   }
+// };
+
+export const createProduct = async (req) => {
+  try {
+    // Parse the request body
+    const body = await req.json();
+
+    // Initialize images array
+    let images = [];
+
+    // Handle different formats of images input
+    if (typeof body.images === "string") {
+      images.push(body.images);
+    } else if (Array.isArray(body.images)) {
+      images = body.images;
+    } else {
+      // Log the issue if `images` is neither string nor array
+      console.error("Invalid images format:", body.images);
+      throw new Error("Invalid images format. Must be a string or an array.");
+    }
+
+    const imagesLinks = [];
+
+    // Upload images to Cloudinary
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(images[i], {
+        folder: "products",
+      });
+
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+
+    // Add processed images and other data to the request body
+    body.images = imagesLinks;
+
+    // Create the product in the database
+    const product = await Product.create(body);
+
+    // Return success response
+    return {
+      success: true,
+      product,
+    };
+  } catch (error) {
+    // Log the error for debugging
+    console.error("Error in Create Product Details controller:", error);
+
+    // Return error response
+    return {
+      success: false,
+      message: error.message || "Failed to create product",
+      statusCode: 500,
+    };
+  }
+};
+
+
 
 // Get All Product
-
-
 
 export const getAllProducts = async (queryParams) => {
   try {
@@ -94,7 +185,7 @@ export const getAllProducts = async (queryParams) => {
 
 
 // Get Product Details
-export const getProductDetails = catchAsyncErrors(async (id) => {
+export const getProductDetails = async (id) => {
   try {
     // Fetch the product by its ID
     const product = await Product.findById(id);
@@ -124,17 +215,17 @@ export const getProductDetails = catchAsyncErrors(async (id) => {
       statusCode: 500,
     };
   }
-});
+};
 
 // Get All Product (Admin)
-export const getAdminProducts = catchAsyncErrors(async () => {
+export const getAdminProducts = async () => {
   const products = await Product.find();
   
   return {
     success: true,
     products,
   }
-  });
+  };
 
 // Update Product -- Admin
 

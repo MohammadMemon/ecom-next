@@ -12,6 +12,7 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.16",
     "@vercel/speed-insights": "^1.1.0",
+    "cloudinary": "^2.5.1",
     "cookie": "^1.0.2",
     "mongodb": "^6.12.0",
     "mongoose": "^8.9.3",

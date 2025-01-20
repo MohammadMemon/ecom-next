@@ -62,7 +62,6 @@ export const getAllProducts = async (queryParams) => {
     // Get the total count of all products in the database
     const productsCount = await Product.countDocuments();
 
-    const start = performance.now();
     // Initialize our API features with the product query and search parameters
     const apiFeature = new ApiFeatures(Product.find(), queryParams)
       .search()    // Apply search functionality
@@ -71,7 +70,6 @@ export const getAllProducts = async (queryParams) => {
     
       // Execute the query after all features have been applied
       const products = await apiFeature.query;
-      console.log(`DB Query Time: ${performance.now() - start}ms`);
       
     // Return successful response with all necessary data
     return {
@@ -128,15 +126,14 @@ export const getProductDetails = catchAsyncErrors(async (id) => {
   }
 });
 
-
 // Get All Product (Admin)
-export const getAdminProducts = catchAsyncErrors(async (req, res, next) => {
+export const getAdminProducts = catchAsyncErrors(async () => {
   const products = await Product.find();
   
-  res.status(200).json({
-  success: true,
-  products,
-  });
+  return {
+    success: true,
+    products,
+  }
   });
 
 // Update Product -- Admin

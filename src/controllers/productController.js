@@ -1,6 +1,6 @@
-import Product from '../models/productModel';
+import Product from "../models/productModel";
 import ApiFeatures from "../utils/apifeatures.js";
-import cloudinary from 'cloudinary';
+import cloudinary from "cloudinary";
 
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -8,7 +8,7 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const  catchAsyncErrors = (theFunc) => async (request, context) => {
+export const catchAsyncErrors = (theFunc) => async (request, context) => {
   try {
     return await theFunc(request, context);
   } catch (error) {
@@ -23,67 +23,6 @@ export const  catchAsyncErrors = (theFunc) => async (request, context) => {
 };
 
 // Create Product -- Admin
-// export const createProduct = async (body) => {
-//   try {
-//     let images = [];
-    
-//     // Handle single image or array of images
-//     if (typeof body.images === "string") {
-//       images.push(body.images);
-//     } else {
-//       images = body.images || [];
-//     }
-
-//     const imagesLinks = [];
-
-//     // Upload images one by one
-//     for (let i = 0; i < images.length; i++) {
-//       try {
-//         const result = await cloudinary.v2.uploader.upload(images[i], {
-//           folder: "products",
-//         });
-
-//         imagesLinks.push({
-//           public_id: result.public_id,
-//           url: result.secure_url,
-//         });
-//       } catch (uploadError) {
-//         console.error("Upload error:", uploadError);
-//         throw new Error(`Failed to upload image: ${uploadError.message}`);
-//       }
-//     }
-
-//     // Create the product
-//     const product = await Product.create({
-//       ...body,
-//       images: imagesLinks,
-//     });
-
-//     return {
-//       success: true,
-//       product,
-//       statusCode: 201
-//     };
-
-//   } catch (error) {
-//     console.error("Error in createProduct:", error);
-    
-//     if (error.name === "ValidationError") {
-//       return {
-//         success: false,
-//         message: error.message,
-//         statusCode: 400
-//       };
-//     }
-
-//     return {
-//       success: false,
-//       message: "Failed to create product",
-//       statusCode: 500
-//     };
-//   }
-// };
-
 export const createProduct = async (req) => {
   try {
     // Parse the request body
@@ -141,27 +80,25 @@ export const createProduct = async (req) => {
   }
 };
 
-
-
 // Get All Product
 
 export const getAllProducts = async (queryParams) => {
   try {
     // Set the number of products to display per page
     const resultPerPage = 8;
-    
+
     // Get the total count of all products in the database
     const productsCount = await Product.countDocuments();
 
     // Initialize our API features with the product query and search parameters
     const apiFeature = new ApiFeatures(Product.find(), queryParams)
-      .search()    // Apply search functionality
-      .filter()    // Apply filters (price, category, etc.)
-      .pagination(resultPerPage);  // Apply pagination
-    
-      // Execute the query after all features have been applied
-      const products = await apiFeature.query;
-      
+      .search() // Apply search functionality
+      .filter() // Apply filters (price, category, etc.)
+      .pagination(resultPerPage); // Apply pagination
+
+    // Execute the query after all features have been applied
+    const products = await apiFeature.query;
+
     // Return successful response with all necessary data
     return {
       success: true,
@@ -172,17 +109,16 @@ export const getAllProducts = async (queryParams) => {
     };
   } catch (error) {
     // Log the error for debugging purposes
-    console.error('Error in getAllProducts controller:', error);
-    
+    console.error("Error in getAllProducts controller:", error);
+
     // Return error response
     return {
       success: false,
-      message: error.message || 'Failed to fetch products',
-      statusCode: 500
+      message: error.message || "Failed to fetch products",
+      statusCode: 500,
     };
   }
 };
-
 
 // Get Product Details
 export const getProductDetails = async (id) => {
@@ -220,186 +156,207 @@ export const getProductDetails = async (id) => {
 // Get All Product (Admin)
 export const getAdminProducts = async () => {
   const products = await Product.find();
-  
+
   return {
     success: true,
     products,
-  }
   };
+};
 
 // Update Product -- Admin
+export const updateProduct = async (id, body) => {
+  try {
+    // Find the product by ID
+    let product = await Product.findById(id);
+    if (!product) {
+      return {
+        success: false,
+        message: "Product not found",
+        statusCode: 404,
+      };
+    }
 
-export const updateProduct = catchAsyncErrors(async (req, res, next) => {
-let product = await Product.findById(req.params.id);
+    // Handle images (if any)
+    let images = [];
+    if (typeof body.images === "string") {
+      images.push(body.images); // Wrap single image in an array
+    } else {
+      images = body.images;
+    }
 
-if (!product) {
-return next(new ErrorHander("Product not found", 404));
-}
+    if (images && images.length > 0) {
+      // Delete old images from Cloudinary
+      for (let i = 0; i < product.images.length; i++) {
+        await cloudinary.uploader.destroy(product.images[i].public_id);
+      }
 
-// Images Start Here
-let images = [];
+      // Upload new images to Cloudinary
+      const imagesLinks = await Promise.all(
+        images.map(async (image) => {
+          const result = await cloudinary.v2.uploader.upload(image, {
+            folder: "products",
+          });
+          return { public_id: result.public_id, url: result.secure_url };
+        })
+      );
 
-if (typeof req.body.images === "string") {
-images.push(req.body.images);
-} else {
-images = req.body.images;
-}
+      body.images = imagesLinks;
+    }
 
-if (images !== undefined) {
-// Deleting Images From Cloudinary
-for (let i = 0; i < product.images.length; i++) {
-  await cloudinary.v2.uploader.destroy(product.images[i].public_id);
-}
+    // Update the product with the new data
+    product = await Product.findByIdAndUpdate(id, body, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
 
-const imagesLinks = [];
-
-for (let i = 0; i < images.length; i++) {
-  const result = await cloudinary.v2.uploader.upload(images[i], {
-    folder: "products",
-  });
-
-  imagesLinks.push({
-    public_id: result.public_id,
-    url: result.secure_url,
-  });
-}
-
-req.body.images = imagesLinks;
-}
-
-product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-new: true,
-runValidators: true,
-useFindAndModify: false,
-});
-
-res.status(200).json({
-success: true,
-product,
-});
-});
+    return {
+      success: true,
+      product,
+    };
+  } catch (error) {
+    console.error("Error in update Product controller:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to update product",
+      statusCode: 500,
+    };
+  }
+};
 
 // Delete Product
 
-export const deleteProduct = catchAsyncErrors(async (req, res, next) => {
-const product = await Product.findById(req.params.id);
+export const deleteProduct = async (id) => {
+  try {
+    const product = await Product.findById(id);
 
-if (!product) {
-return next(new ErrorHander("Product not found", 404));
-}
+    if (!product) {
+      return {
+        success: false,
+        message: "Product not found",
+        statusCode: 404,
+      };
+    }
 
-// Deleting Images From Cloudinary
-for (let i = 0; i < product.images.length; i++) {
-await cloudinary.v2.uploader.destroy(product.images[i].public_id);
-}
+    // Deleting Images From Cloudinary
+    for (let i = 0; i < product.images.length; i++) {
+      await cloudinary.uploader.destroy(product.images[i].public_id);
+    }
 
-await product.remove();
-
-res.status(200).json({
-success: true,
-message: "Product Delete Successfully",
-});
-});
+    await  Product.findByIdAndDelete(id);
+    return {
+      success: true,
+      message: "Product Deleted Successfully",
+    };
+  } catch (error) {
+    console.error("Error in delete Product controller:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to delete product",
+      statusCode: 500,
+    };
+  }
+};
 
 // Create New Review or Update the review
 export const createProductReview = catchAsyncErrors(async (req, res, next) => {
-const { rating, comment, productId } = req.body;
+  const { rating, comment, productId } = req.body;
 
-const review = {
-user: req.user._id,
-name: req.user.name,
-rating: Number(rating),
-comment,
-};
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+  };
 
-const product = await Product.findById(productId);
+  const product = await Product.findById(productId);
 
-const isReviewed = product.reviews.find(
-(rev) => rev.user.toString() === req.user._id.toString()
-);
+  const isReviewed = product.reviews.find(
+    (rev) => rev.user.toString() === req.user._id.toString()
+  );
 
-if (isReviewed) {
-product.reviews.forEach((rev) => {
-  if (rev.user.toString() === req.user._id.toString())
-    (rev.rating = rating), (rev.comment = comment);
-});
-} else {
-product.reviews.push(review);
-product.numOfReviews = product.reviews.length;
-}
+  if (isReviewed) {
+    product.reviews.forEach((rev) => {
+      if (rev.user.toString() === req.user._id.toString())
+        (rev.rating = rating), (rev.comment = comment);
+    });
+  } else {
+    product.reviews.push(review);
+    product.numOfReviews = product.reviews.length;
+  }
 
-let avg = 0;
+  let avg = 0;
 
-product.reviews.forEach((rev) => {
-avg += rev.rating;
-});
+  product.reviews.forEach((rev) => {
+    avg += rev.rating;
+  });
 
-product.ratings = avg / product.reviews.length;
+  product.ratings = avg / product.reviews.length;
 
-await product.save({ validateBeforeSave: false });
+  await product.save({ validateBeforeSave: false });
 
-res.status(200).json({
-success: true,
-});
+  res.status(200).json({
+    success: true,
+  });
 });
 
 // Get All Reviews of a product
 export const getProductReviews = catchAsyncErrors(async (req, res, next) => {
-const product = await Product.findById(req.query.id);
+  const product = await Product.findById(req.query.id);
 
-if (!product) {
-return next(new ErrorHander("Product not found", 404));
-}
+  if (!product) {
+    return next(new ErrorHander("Product not found", 404));
+  }
 
-res.status(200).json({
-success: true,
-reviews: product.reviews,
-});
+  res.status(200).json({
+    success: true,
+    reviews: product.reviews,
+  });
 });
 
 // Delete Review
 export const deleteReview = catchAsyncErrors(async (req, res, next) => {
-const product = await Product.findById(req.query.productId);
+  const product = await Product.findById(req.query.productId);
 
-if (!product) {
-return next(new ErrorHander("Product not found", 404));
-}
+  if (!product) {
+    return next(new ErrorHander("Product not found", 404));
+  }
 
-const reviews = product.reviews.filter(
-(rev) => rev._id.toString() !== req.query.id.toString()
-);
+  const reviews = product.reviews.filter(
+    (rev) => rev._id.toString() !== req.query.id.toString()
+  );
 
-let avg = 0;
+  let avg = 0;
 
-reviews.forEach((rev) => {
-avg += rev.rating;
-});
+  reviews.forEach((rev) => {
+    avg += rev.rating;
+  });
 
-let ratings = 0;
+  let ratings = 0;
 
-if (reviews.length === 0) {
-ratings = 0;
-} else {
-ratings = avg / reviews.length;
-}
+  if (reviews.length === 0) {
+    ratings = 0;
+  } else {
+    ratings = avg / reviews.length;
+  }
 
-const numOfReviews = reviews.length;
+  const numOfReviews = reviews.length;
 
-await Product.findByIdAndUpdate(
-req.query.productId,
-{
-  reviews,
-  ratings,
-  numOfReviews,
-},
-{
-  new: true,
-  runValidators: true,
-  useFindAndModify: false,
-}
-);
+  await Product.findByIdAndUpdate(
+    req.query.productId,
+    {
+      reviews,
+      ratings,
+      numOfReviews,
+    },
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    }
+  );
 
-res.status(200).json({
-success: true,
-});
+  res.status(200).json({
+    success: true,
+  });
 });

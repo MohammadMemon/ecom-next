@@ -25,26 +25,22 @@ export const catchAsyncErrors = (theFunc) => async (request, context) => {
 // Create Product -- Admin
 export const createProduct = async (req) => {
   try {
-    // Parse the request body
     const body = await req.json();
 
-    // Initialize images array
     let images = [];
 
-    // Handle different formats of images input
     if (typeof body.images === "string") {
       images.push(body.images);
     } else if (Array.isArray(body.images)) {
       images = body.images;
     } else {
-      // Log the issue if `images` is neither string nor array
       console.error("Invalid images format:", body.images);
       throw new Error("Invalid images format. Must be a string or an array.");
     }
 
     const imagesLinks = [];
 
-    // Upload images to Cloudinary
+    // Uploading images to Cloudinary
     for (let i = 0; i < images.length; i++) {
       const result = await cloudinary.v2.uploader.upload(images[i], {
         folder: "products",
@@ -56,22 +52,19 @@ export const createProduct = async (req) => {
       });
     }
 
-    // Add processed images and other data to the request body
+    // Adding processed images in body
     body.images = imagesLinks;
 
-    // Create the product in the database
+    // Creating the product in db
     const product = await Product.create(body);
 
-    // Return success response
     return {
       success: true,
       product,
     };
   } catch (error) {
-    // Log the error for debugging
     console.error("Error in Create Product Details controller:", error);
 
-    // Return error response
     return {
       success: false,
       message: error.message || "Failed to create product",
@@ -84,10 +77,9 @@ export const createProduct = async (req) => {
 
 export const getAllProducts = async (queryParams) => {
   try {
-    // Set the number of products to display per page
+    //paginationn
     const resultPerPage = 8;
-
-    // Get the total count of all products in the database
+    //counting total
     const productsCount = await Product.countDocuments();
 
     // Initialize our API features with the product query and search parameters
@@ -123,10 +115,8 @@ export const getAllProducts = async (queryParams) => {
 // Get Product Details
 export const getProductDetails = async (id) => {
   try {
-    // Fetch the product by its ID
     const product = await Product.findById(id);
 
-    // Check if the product exists
     if (!product) {
       return {
         success: false,
@@ -135,16 +125,13 @@ export const getProductDetails = async (id) => {
       };
     }
 
-    // Return the product details
     return {
       success: true,
       product,
     };
   } catch (error) {
-    // Log the error
     console.error("Error in Get Product Details controller:", error);
 
-    // Return error response
     return {
       success: false,
       message: error.message || "Failed to fetch product",
@@ -166,7 +153,6 @@ export const getAdminProducts = async () => {
 // Update Product -- Admin
 export const updateProduct = async (id, body) => {
   try {
-    // Find the product by ID
     let product = await Product.findById(id);
     if (!product) {
       return {
@@ -179,7 +165,7 @@ export const updateProduct = async (id, body) => {
     // Handle images (if any)
     let images = [];
     if (typeof body.images === "string") {
-      images.push(body.images); // Wrap single image in an array
+      images.push(body.images);
     } else {
       images = body.images;
     }
@@ -243,7 +229,7 @@ export const deleteProduct = async (id) => {
       await cloudinary.uploader.destroy(product.images[i].public_id);
     }
 
-    await  Product.findByIdAndDelete(id);
+    await Product.findByIdAndDelete(id);
     return {
       success: true,
       message: "Product Deleted Successfully",
@@ -259,71 +245,97 @@ export const deleteProduct = async (id) => {
 };
 
 // Create New Review or Update the review
-export const createProductReview = catchAsyncErrors(async (req, res, next) => {
-  const { rating, comment, productId } = req.body;
+export const createProductReview = async (id, body) => {
+  try {
+    const { rating, comment, productId } = body;
 
-  const review = {
-    user: req.user._id,
-    name: req.user.name,
-    rating: Number(rating),
-    comment,
-  };
+    const review = {
+      user: id,
+      rating: Number(rating),
+      comment,
+    };
 
-  const product = await Product.findById(productId);
+    const product = await Product.findById(productId);
 
-  const isReviewed = product.reviews.find(
-    (rev) => rev.user.toString() === req.user._id.toString()
-  );
+    const isReviewed = product.reviews.find(
+      (rev) => rev.user.toString() === id.toString()
+    );
 
-  if (isReviewed) {
+    if (isReviewed) {
+      product.reviews.forEach((rev) => {
+        if (rev.user.toString() === id.toString())
+          (rev.rating = rating), (rev.comment = comment);
+      });
+    } else {
+      product.reviews.push(review);
+      product.numOfReviews = product.reviews.length;
+    }
+
+    let avg = 0;
+
     product.reviews.forEach((rev) => {
-      if (rev.user.toString() === req.user._id.toString())
-        (rev.rating = rating), (rev.comment = comment);
+      avg += rev.rating;
     });
-  } else {
-    product.reviews.push(review);
-    product.numOfReviews = product.reviews.length;
+
+    product.ratings = avg / product.reviews.length;
+
+    await product.save({ validateBeforeSave: false });
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in Create Product rewiew controller:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to create product review",
+      statusCode: 500,
+    };
   }
-
-  let avg = 0;
-
-  product.reviews.forEach((rev) => {
-    avg += rev.rating;
-  });
-
-  product.ratings = avg / product.reviews.length;
-
-  await product.save({ validateBeforeSave: false });
-
-  res.status(200).json({
-    success: true,
-  });
-});
+};
 
 // Get All Reviews of a product
-export const getProductReviews = catchAsyncErrors(async (req, res, next) => {
-  const product = await Product.findById(req.query.id);
+export const getProductReviews = async (id) => {
+  try{
+  const product = await Product.findById(id);
 
   if (!product) {
-    return next(new ErrorHander("Product not found", 404));
+    return{
+      success:false,
+      message: "Product not found",
+      statusCode: 404,
+    } 
   }
 
-  res.status(200).json({
+  return {
     success: true,
     reviews: product.reviews,
-  });
-});
+  };
+} catch (error) {
+  console.error("Error in get Product rewiew controller:", error);
+  return {
+    success: false,
+    message: error.message || "Failed to get product review",
+    statusCode: 500,
+  };
+}
+};
 
 // Delete Review
-export const deleteReview = catchAsyncErrors(async (req, res, next) => {
-  const product = await Product.findById(req.query.productId);
+export const deleteReview = async (id, productId ) => {
+  try{
+  const product = await Product.findById(productId);
 
   if (!product) {
-    return next(new ErrorHander("Product not found", 404));
+    return{
+      success:false,
+      message: "Product not found",
+      statusCode: 404,
+    } 
   }
 
   const reviews = product.reviews.filter(
-    (rev) => rev._id.toString() !== req.query.id.toString()
+    (rev) => rev._id.toString() !== id.toString()
   );
 
   let avg = 0;
@@ -343,7 +355,7 @@ export const deleteReview = catchAsyncErrors(async (req, res, next) => {
   const numOfReviews = reviews.length;
 
   await Product.findByIdAndUpdate(
-    req.query.productId,
+    productId,
     {
       reviews,
       ratings,
@@ -356,7 +368,15 @@ export const deleteReview = catchAsyncErrors(async (req, res, next) => {
     }
   );
 
-  res.status(200).json({
+  return {
     success: true,
-  });
-});
+  };
+} catch (error) {
+  console.error("Error in delete Product rewiew controller:", error);
+  return {
+    success: false,
+    message: error.message || "Failed to delete product review",
+    statusCode: 500,
+  };
+}
+};

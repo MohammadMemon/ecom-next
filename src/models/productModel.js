@@ -138,7 +138,7 @@ export default Product;
 //   },
 //   specifications: {
 //     type: Map,
-//     of: String,  // Key-value pairs for specs like weight, dimensions, etc.
+//     of: String,  
 //     default: {},
 //   },
 //  variants: [

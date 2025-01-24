@@ -8,20 +8,6 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const catchAsyncErrors = (theFunc) => async (request, context) => {
-  try {
-    return await theFunc(request, context);
-  } catch (error) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        message: error.message || "Internal Server Error",
-      }),
-      { status: error.statusCode || 500 }
-    );
-  }
-};
-
 // Create Product -- Admin
 export const createProduct = async (req) => {
   try {

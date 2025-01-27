@@ -1,6 +1,10 @@
 import dbConnect from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
-import { createProductReview , getProductReviews, deleteReview} from "@/controllers/productController";
+import {
+  createProductReview,
+  getProductReviews,
+  deleteReview,
+} from "@/controllers/productController";
 import { createClient } from "@/utils/supabase/server";
 
 export async function PUT(req) {
@@ -65,9 +69,9 @@ export async function GET(req) {
 }
 export async function DELETE(req) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id")
+  const id = searchParams.get("id");
   const productId = searchParams.get("productId");
-  const response = await deleteReview(id,productId);
+  const response = await deleteReview(id, productId);
 
   if (response.success) {
     return NextResponse.json(response, { status: 200 });

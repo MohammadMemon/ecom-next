@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
   shippingInfo: {
@@ -19,7 +19,7 @@ const orderSchema = new mongoose.Schema({
     country: {
       type: String,
       required: true,
-      default: "India"
+      default: "India",
     },
     pinCode: {
       type: Number,
@@ -36,10 +36,6 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      oldPrice: {
-        type: Number,
-        required: true,
-      },
       price: {
         type: Number,
         required: true,
@@ -52,18 +48,6 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      alphabet:{
-        type: String,
-        required: false,
-      },
-      nameOne:{
-        type: String,
-        required: false,
-      },
-      nameTwo:{
-        type: String,
-        required: false,
-      },
       product: {
         type: mongoose.Schema.ObjectId,
         ref: "Product",
@@ -72,8 +56,7 @@ const orderSchema = new mongoose.Schema({
     },
   ],
   user: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
+    type: String,
     required: true,
   },
   paymentInfo: {
@@ -100,16 +83,6 @@ const orderSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  discount:{
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  totalOldPrice:{
-    type: Number,
-    required: true,
-    default: 0,
-  },
   totalPrice: {
     type: Number,
     required: true,
@@ -127,4 +100,11 @@ const orderSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Order", orderSchema);
+let Order;
+
+if (mongoose.models.Order) {
+  Order = mongoose.models.Order; // Use the existing model if it's already registered
+} else {
+  Order = mongoose.model("Order", orderSchema, "orders"); // Otherwise, create a new model
+}
+export default Order;

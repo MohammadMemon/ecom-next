@@ -1,60 +1,73 @@
-const Order = require("../models/orderModel");
-const Product = require("../models/productModel");
-const User = require("../models/userModel");
-const ErrorHander = require("../utils/errorhandler.js");
-const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-const sendEmail = require("../utils/sendEmail");
+import Order from "@/models/orderModel";
+import Product from "@/models/productModel";
+
+export const catchAsyncErrors = (theFunc) => async (request, context) => {
+  try {
+    return await theFunc(request, context);
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: error.message || "Internal Server Error",
+      }),
+      { status: error.statusCode || 500 }
+    );
+  }
+};
+
+// const sendEmail = require("../utils/sendEmail");
 
 // Create new Order
-export const newOrder = catchAsyncErrors(async (req, res, next) => {
-  const {
-    shippingInfo,
-    orderItems,
-    paymentInfo,
-    itemsPrice,
-    taxPrice,
-    discount,
-    totalOldPrice,
-    shippingPrice,
-    totalPrice,
-  } = req.body;
+export const newOrder = async (body, userId) => {
+  try {
+    // Validate userId
+    if (!userId) {
+      return { success: false, message: "User ID is required" };
+    }
 
-  const order = await Order.create({
-    shippingInfo,
-    orderItems,
-    paymentInfo,
-    itemsPrice,
-    taxPrice,
-    discount,
-    totalOldPrice,
-    shippingPrice,
-    totalPrice,
-    paidAt: Date.now(),
-    user: req.user._id,
-  });
+    const order = await Order.create({
+      itemsPrice: body.itemsPrice,
+      taxPrice: body.taxPrice,
+      shippingPrice: body.shippingPrice,
+      totalPrice: body.totalPrice,
+      orderItems: body.orderItems,
+      shippingInfo: body.shippingInfo,
+      paymentInfo: body.paymentInfo,
+      paidAt: Date.now(),
+      user: userId,
+    });
+    return {
+      success: true,
+      order,
+    };
+  } catch (error) {
+    console.error("Error in New Order controller:", error);
 
-  res.status(201).json({
-    success: true,
-    order,
-  });
-});
+    return {
+      success: false,
+      message: error.message || "Failed to create newOrder",
+      statusCode: 500,
+    };
+  }
+};
 
 // get Single Order
-export const getSingleOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id).populate(
-    "user",
-    "name email"
-  );
+export const getSingleOrder = async (id) => {
+  const order = await Order.findById(id).populate("user", "name email");
 
   if (!order) {
-    return next(new ErrorHander("Order not found with this Id", 404));
+    return {
+      success: false,
+      message: "Order not found",
+      statusCode: 404,
+    };
   }
 
-  res.status(200).json({
+  return {
     success: true,
     order,
-  });
-});
+  };
+};
 
 // get logged in user  Orders
 export const myOrders = catchAsyncErrors(async (req, res, next) => {
@@ -100,7 +113,6 @@ export const updateOrder = catchAsyncErrors(async (req, res, next) => {
   }
 
   if (req.body.status === "Shipped") {
-
     const message = ` Hey ${user.name} :- \n Your order from MyArtWorld is shipped!\n We hope you're as exceted as we are! \n Your order will reach you in 2-7 Working days depending on your location.`;
 
     try {
@@ -126,7 +138,6 @@ export const updateOrder = catchAsyncErrors(async (req, res, next) => {
   order.orderStatus = req.body.status;
 
   if (req.body.status === "Delivered") {
-
     const message = ` Hey ${user.name} :- \n We have delivered your order. \n Order Id: ${order.id}.\n We hope you liked our service.`;
 
     try {
@@ -143,7 +154,6 @@ export const updateOrder = catchAsyncErrors(async (req, res, next) => {
     } catch (error) {
       return next(new ErrorHander(error.message, 500));
     }
-    
 
     order.deliveredAt = Date.now();
   }

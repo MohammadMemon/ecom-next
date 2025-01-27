@@ -69,18 +69,17 @@ export const getSingleOrder = async (id) => {
   };
 };
 
-// get logged in user  Orders
-export const myOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await Order.find({ user: req.user._id });
-
-  res.status(200).json({
+// get logged in user Orders
+export const myOrders = async (userId) => {
+  const orders = await Order.find({ user: userId });
+  return {
     success: true,
     orders,
-  });
-});
+  };
+};
 
 // get all Orders -- Admin
-export const getAllOrders = catchAsyncErrors(async (req, res, next) => {
+export const getAllOrders = async () => {
   const orders = await Order.find();
 
   let totalAmount = 0;
@@ -88,13 +87,12 @@ export const getAllOrders = catchAsyncErrors(async (req, res, next) => {
   orders.forEach((order) => {
     totalAmount += order.totalPrice;
   });
-
-  res.status(200).json({
+  return {
     success: true,
     totalAmount,
     orders,
-  });
-});
+  };
+};
 
 // update Order Status -- Admin
 export const updateOrder = catchAsyncErrors(async (req, res, next) => {
@@ -173,16 +171,20 @@ async function updateStock(id, quantity) {
 }
 
 // delete Order -- Admin
-export const deleteOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
+export const deleteOrder = async (id) => {
+  const order = await Order.findById(id);
 
   if (!order) {
-    return next(new ErrorHander("Order not found with this Id", 404));
+    return {
+      success: false,
+      message: "Order not found",
+      statusCode: 404,
+    };
   }
 
-  await order.remove();
+  await Order.findByIdAndDelete(id);
 
-  res.status(200).json({
+  return {
     success: true,
-  });
-});
+  };
+};

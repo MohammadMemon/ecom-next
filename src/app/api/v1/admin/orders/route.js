@@ -1,12 +1,10 @@
 import dbConnect from "@/lib/dbConnect";
-import { getSingleOrder } from "@/controllers/orderController";
+import { getAllOrders, myOrders } from "@/controllers/orderController";
 import { NextResponse } from "next/server";
 
-export async function GET(req, { params }) {
+export async function GET() {
   await dbConnect();
-  // Extract product ID from params
-  const { id } = await params;
-  const response = await getSingleOrder(id);
+  const response = await getAllOrders();
   if (response.success) {
     return NextResponse.json(response, { status: 201 });
   } else {

@@ -1,10 +1,8 @@
-import { signup } from "./actions.js";
+import { signup } from "../login/actions";
 
 export default function SignUpPage() {
   return (
     <form>
-      <label htmlFor="name">Name::</label>
-      <input id="name" name="name" type="text" required />
       <label htmlFor="email">Email:</label>
       <input id="email" name="email" type="email" required />
       <label htmlFor="password">Password:</label>

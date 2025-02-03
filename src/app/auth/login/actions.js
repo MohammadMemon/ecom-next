@@ -1,28 +1,25 @@
 "use server";
 
-import supabaseAdmin from "@/utils/supabase/admin";
-
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function login(formData) {
+export async function login(email, password) {
   const supabase = await createClient();
 
   const data = {
-    email: formData.get("email"),
-    password: formData.get("password"),
+    email: email,
+    password: password,
   };
-
   const { error } = await supabase.auth.signInWithPassword(data);
+  console.log(error);
 
   if (error) {
-    console.log(error);
-    redirect("/error");
+    return redirect(`/auth/login?error=${encodeURIComponent(error.message)}`);
+  } else {
+    revalidatePath("/", "layout");
+    redirect("/?loggedIn=true");
   }
-
-  revalidatePath("/", "layout");
-  redirect("/");
 }
 
 // export async function signup(formData) {

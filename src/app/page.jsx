@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/utils/supabase/client";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -11,15 +12,28 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     console.log;
-    const success = searchParams.get("loggedIn");
-
-    if (success === "true") {
+    const loginSuccess = searchParams.get("loggedIn");
+    const passwordResetSuccess = searchParams.get("passwordReset");
+    if (loginSuccess === "true") {
       setTimeout(() => {
         toast({
           title: "Login Successful",
           description: "You have successfully logged in.",
         });
-      }, 300); // Delay by 300ms or more if needed
+      }, 300);
+
+      if (!pathname.includes("loggedIn")) {
+        window.history.replaceState({}, "", pathname);
+      }
+    }
+    if (passwordResetSuccess === "true") {
+      setTimeout(() => {
+        toast({
+          title: "Password Reset Successful",
+          description:
+            "Your password has been successfully reset. You are now logged in.",
+        });
+      }, 300);
 
       if (!pathname.includes("loggedIn")) {
         window.history.replaceState({}, "", pathname);
@@ -44,8 +58,18 @@ export default function Home() {
     }
   };
   return (
-    <h1 className="font-bold text-2xl flex flex-col justify-center items-center min-h-screen">
-      Hello, from cycledaddy
-    </h1>
+    <div className="flex flex-col items-center justify-center min-h-screen text-2xl font-bold">
+      <h1>Hello, from cycledaddy</h1>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          logout();
+        }}
+      >
+        <Button className="m-2" type="submit" disabled={loading}>
+          {loading ? "Logging out..." : "Logout"}
+        </Button>
+      </form>
+    </div>
   );
 }

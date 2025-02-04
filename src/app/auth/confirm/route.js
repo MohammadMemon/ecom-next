@@ -1,25 +1,36 @@
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 export async function GET(request) {
-  const { searchParams } = new URL(request.url)
-  const token_hash = searchParams.get('token_hash')
-  const type = searchParams.get('type')
-  const next = searchParams.get('next') ?? '/'
+  const { searchParams } = new URL(request.url);
+
+  // Get parameters from the URL
+  const token_hash = searchParams.get("token_hash");
+  const type = searchParams.get("type");
+  const redirectUrl = searchParams.get("redirectUrl") || "/";
+
+  const supabase = await createClient();
 
   if (token_hash && type) {
-    const supabase = await createClient()
-
     const { error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
-    })
-    if (!error) {
-      // redirect user to specified redirect URL or root of app
-      redirect(next)
+    });
+
+    if (error) {
+      return redirect("/error"); // Redirect to error page if verification fails
+    }
+
+    // 🔹 Handle different authentication flows after OTP verification:
+    if (type === "signup") {
+      redirect("/"); // Redirect new users after signup confirmation
+    } else if (type === "recovery") {
+      redirect("/auth/reset-password"); // Redirect to reset password page
+    } else {
+      redirect(redirectUrl); // Default: Redirect user to home or provided URL
     }
   }
 
-  // redirect the user to an error page with some instructions
-  redirect('/error')
+  // If token_hash or type is missing, redirect to error
+  redirect("/error");
 }

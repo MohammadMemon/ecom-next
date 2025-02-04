@@ -140,7 +140,6 @@ export async function signup(formData) {
         signUpData.user.recovery_sent_at); // Presence of recovery_sent_at indicates existing user
 
     if (isExistingUser) {
-      console.log("existing user");
       // This is an existing user, send password reset email
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         email,

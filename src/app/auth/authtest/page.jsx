@@ -10,5 +10,9 @@ export default async function PrivatePage() {
     redirect("/auth/login");
   }
 
-  return <p>Hello {data.user.email}</p>;
+  return (
+    <p>
+      Hello {data.user.email}, {data.user.user_metadata.full_name}
+    </p>
+  );
 }

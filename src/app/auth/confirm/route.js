@@ -23,7 +23,7 @@ export async function GET(request) {
 
     // 🔹 Handle different authentication flows after OTP verification:
     if (type === "signup") {
-      redirect("/"); // Redirect new users after signup confirmation
+      redirect("/?loggedIn=true"); // Redirect new users after signup confirmation
     } else if (type === "recovery") {
       redirect("/auth/reset-password"); // Redirect to reset password page
     } else {

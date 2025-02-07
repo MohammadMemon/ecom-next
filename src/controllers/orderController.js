@@ -1,21 +1,6 @@
+import sendEmail from "@/app/api/v1/emailtest/route";
 import Order from "@/models/orderModel";
 import Product from "@/models/productModel";
-
-export const catchAsyncErrors = (theFunc) => async (request, context) => {
-  try {
-    return await theFunc(request, context);
-  } catch (error) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        message: error.message || "Internal Server Error",
-      }),
-      { status: error.statusCode || 500 }
-    );
-  }
-};
-
-// const sendEmail = require("../utils/sendEmail");
 
 // Create new Order
 export const newOrder = async (body, userId) => {
@@ -95,7 +80,7 @@ export const getAllOrders = async () => {
 };
 
 // update Order Status -- Admin
-export const updateOrder = catchAsyncErrors(async (req, res, next) => {
+export const updateOrder = async (req, res, next) => {
   const order = await Order.findById(req.params.id);
 
   const user = await User.findOne({ email: req.body.email });
@@ -111,12 +96,12 @@ export const updateOrder = catchAsyncErrors(async (req, res, next) => {
   }
 
   if (req.body.status === "Shipped") {
-    const message = ` Hey ${user.name} :- \n Your order from MyArtWorld is shipped!\n We hope you're as exceted as we are! \n Your order will reach you in 2-7 Working days depending on your location.`;
+    const message = ` Hey ${user.name} :- \n Your order from Cycledaddy is shipped!\n We hope you're as exceted as we are! \n Your order will reach you in 2-7 Working days depending on your location.`;
 
     try {
       await sendEmail({
         email: user.email,
-        subject: `Your order from MyArtWorld is shipped!`,
+        subject: `Your order from Cycledaddy is shipped!`,
         message,
       });
 
@@ -141,7 +126,7 @@ export const updateOrder = catchAsyncErrors(async (req, res, next) => {
     try {
       await sendEmail({
         email: user.email,
-        subject: `Your order from MyArtWorld is delivered!`,
+        subject: `Your order from Cycledaddy is delivered!`,
         message,
       });
 
@@ -160,7 +145,7 @@ export const updateOrder = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
   });
-});
+};
 
 async function updateStock(id, quantity) {
   const product = await Product.findById(id);

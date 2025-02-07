@@ -11,8 +11,10 @@ export default async function PrivatePage() {
   }
 
   return (
-    <p>
-      Hello {data.user.email}, {data.user.user_metadata.full_name}
-    </p>
+    <div className="flex flex-col items-center justify-center min-h-screen text-xl font-bold bg-muted">
+      <p className="mx-4">
+        Hello {data.user.user_metadata.full_name}, Email: {data.user.email}
+      </p>
+    </div>
   );
 }

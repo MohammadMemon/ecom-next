@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login, oauthLogin } from "@/app/auth/login/actions";
+import { signup } from "@/app/auth/signup/actions";
 import React, { useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
@@ -12,24 +12,73 @@ import { useSearchParams, usePathname, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Eye, EyeOff } from "lucide-react";
 
-export function LoginForm({ className, ...props }) {
+export function SignupForm({ className, ...props }) {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
+  // Validation functions
+  const validateEmail = (email) =>
+    String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+
+  const validatePassword = (password) =>
+    String(password).match(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/
+    );
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const response = await login(email, password);
-    console.log(response.error);
-    console.log(error);
+    if (!validateEmail(email)) {
+      setLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+      });
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Invalid Password",
+        description:
+          "Password must be at least 8 characters long and include a number, uppercase letter, and special character.",
+      });
+      return;
+    }
+
+    try {
+      const response = await signup(email, password, name);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+    } catch (error) {
+      if (error?.message !== "NEXT_REDIRECT") {
+        toast({
+          variant: "destructive",
+          title: "Signup Failed",
+          description: error.message || "An unexpected error occurred.",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
+
   const handleGoogleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -95,12 +144,23 @@ export function LoginForm({ className, ...props }) {
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">Sign Up</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-6">
               <div className="grid gap-6">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -113,15 +173,7 @@ export function LoginForm({ className, ...props }) {
                   />
                 </div>
                 <div className="grid gap-2 relative">
-                  <div className="flex items-center ">
-                    <Label htmlFor="password">Password</Label>
-                    <a
-                      href="/auth/forgot-password"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </a>
-                  </div>
+                  <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -140,7 +192,7 @@ export function LoginForm({ className, ...props }) {
                   </button>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Loading..." : "Login"}
+                  {loading ? "Loading..." : "Signup"}
                 </Button>
               </div>
               <div className="relative text-sm text-center after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -161,13 +213,13 @@ export function LoginForm({ className, ...props }) {
                       fill="currentColor"
                     />
                   </svg>
-                  {loading ? "Loading..." : "Login with Google"}
+                  {loading ? "Loading..." : "Signup with Google"}
                 </Button>
               </div>
               <div className="text-sm text-center">
-                Don&apos;t have an account?{" "}
-                <a href="/auth/signup" className="underline underline-offset-4">
-                  Sign up
+                Have an account?{" "}
+                <a href="/auth/login" className="underline underline-offset-4">
+                  Login
                 </a>
               </div>
             </div>

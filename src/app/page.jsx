@@ -44,7 +44,7 @@ export default function Home() {
   const logout = async () => {
     setLoading(true);
     try {
-      const supabase = await createClient();
+      const supabase = createClient();
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Error logging out:", error);
@@ -58,7 +58,7 @@ export default function Home() {
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-2xl font-bold">
+    <div className="flex flex-col items-center justify-center min-h-screen text-2xl font-bold bg-muted">
       <h1>Hello, from cycledaddy</h1>
       <form
         onSubmit={(e) => {
@@ -66,7 +66,7 @@ export default function Home() {
           logout();
         }}
       >
-        <Button className="m-2" type="submit" disabled={loading}>
+        <Button className="m-2 " type="submit" disabled={loading}>
           {loading ? "Logging out..." : "Logout"}
         </Button>
       </form>

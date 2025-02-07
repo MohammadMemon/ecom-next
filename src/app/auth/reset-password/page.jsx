@@ -7,10 +7,12 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { resetPassword } from "./actions";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function ForgotPassword() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -67,16 +69,29 @@ export default function ForgotPassword() {
               <form onSubmit={handleSubmit}>
                 <div className="grid gap-6">
                   <div className="grid gap-6">
-                    <div className="grid gap-2">
-                      <Label htmlFor="password">New Password</Label>
+                    <div className="grid gap-2 relative">
+                      <Label htmlFor="password">Update Password</Label>
                       <Input
                         id="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="Password@123"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        className="pr-10" // Add padding to prevent text overlap with icon
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-full  text-gray-500 hover:text-gray-700"
+                      >
+                        {showPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+
                       <Button
                         type="submit"
                         className="w-full"

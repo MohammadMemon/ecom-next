@@ -1,13 +1,19 @@
-import { signup } from "../login/actions";
+"use client";
+
+import { SignupForm } from "@/components/signup-form";
 
 export default function SignUpPage() {
   return (
-    <form>
-      <label htmlFor="email">Email:</label>
-      <input id="email" name="email" type="email" required />
-      <label htmlFor="password">Password:</label>
-      <input id="password" name="password" type="password" required />
-      <button formAction={signup}>Sign-Up</button>
-    </form>
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <a href="/" className="flex items-center gap-2 self-center font-medium">
+          <div className="flex h-6 w-6 items-center justify-center rounded-md  text-primary-foreground">
+            {/* logo daal */}
+          </div>
+          Cycledaddy
+        </a>
+        <SignupForm />
+      </div>
+    </div>
   );
 }

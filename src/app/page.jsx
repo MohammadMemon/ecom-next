@@ -1,4 +1,5 @@
 "use client";
+import Hero from "@/components/Home/Hero";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/utils/supabase/client";
@@ -58,8 +59,8 @@ export default function Home() {
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-2xl font-bold bg-muted">
-      <h1>Hello, from cycledaddy</h1>
+    <div className="flex flex-col items-center justify-center text-2xl font-bold bg-muted">
+      <Hero />
       <form
         onSubmit={(e) => {
           e.preventDefault();

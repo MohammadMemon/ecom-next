@@ -53,7 +53,7 @@ const Navbar = () => {
       ],
     },
     {
-      name: "Components",
+      name: "Gears & Chains",
       href: "/components",
       subcategories: [
         {
@@ -77,7 +77,7 @@ const Navbar = () => {
       ],
     },
     {
-      name: "Wheels & Tyres",
+      name: "Wheels & Suspension",
       href: "/components",
       subcategories: [
         {
@@ -87,7 +87,11 @@ const Navbar = () => {
       ],
     },
     {
-      name: "Seats",
+      name: "Brakes",
+      href: "/components",
+    },
+    {
+      name: "Components ",
       href: "/components",
     },
     {
@@ -95,11 +99,7 @@ const Navbar = () => {
       href: "/components",
     },
     {
-      name: "Rider Essentials",
-      href: "/components",
-    },
-    {
-      name: "Maintenance",
+      name: "Add-ons",
       href: "/components",
     },
   ];
@@ -139,9 +139,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 z-50 w-full">
+    <nav className="fixed top-0 z-50 w-full ">
       {/* Main Navbar */}
-      <div className="mx-4 my-2 font-bold text-black border rounded-lg shadow-lg backdrop-blur-md bg-white/30 border-white/10">
+      <div className="mx-4 my-2 font-bold text-black border rounded-lg shadow-lg backdrop-blur-md bg-white/30 ">
         <div className="px-4 mx-auto max-w-7xl">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -177,7 +177,7 @@ const Navbar = () => {
                             {/* Desktop Sub-Dropdown */}
                             <div className="absolute top-0 invisible w-48 transition-all opacity-0 left-full group-hover/sub:visible group-hover/sub:opacity-100">
                               {subcategory.subSubcategories?.length > 0 && (
-                                <div className="py-2 ml-2 rounded-lg shadow-lg bg-[#0A6E45] backdrop-blur-md">
+                                <div className="py-2 ml-2  rounded-lg shadow-lg backdrop-blur-md bg-[#0A6E45]">
                                   {subcategory.subSubcategories.map(
                                     (subSub) => (
                                       <Link

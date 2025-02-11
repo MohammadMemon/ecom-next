@@ -76,6 +76,9 @@ const config = {
       },
     },
   },
+  corePlugins: {
+    backdropFilter: true,
+  },
 
   plugins: [require("tailwindcss-animate")],
 };

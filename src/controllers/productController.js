@@ -64,7 +64,7 @@ export const createProduct = async (req) => {
 export const getAllProducts = async (queryParams) => {
   try {
     //paginationn
-    const resultPerPage = 8;
+    const resultPerPage = 300;
     //counting total
     const productsCount = await Product.countDocuments();
 
@@ -282,87 +282,87 @@ export const createProductReview = async (id, body) => {
 
 // Get All Reviews of a product
 export const getProductReviews = async (id) => {
-  try{
-  const product = await Product.findById(id);
+  try {
+    const product = await Product.findById(id);
 
-  if (!product) {
-    return{
-      success:false,
-      message: "Product not found",
-      statusCode: 404,
-    } 
+    if (!product) {
+      return {
+        success: false,
+        message: "Product not found",
+        statusCode: 404,
+      };
+    }
+
+    return {
+      success: true,
+      reviews: product.reviews,
+    };
+  } catch (error) {
+    console.error("Error in get Product rewiew controller:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to get product review",
+      statusCode: 500,
+    };
   }
-
-  return {
-    success: true,
-    reviews: product.reviews,
-  };
-} catch (error) {
-  console.error("Error in get Product rewiew controller:", error);
-  return {
-    success: false,
-    message: error.message || "Failed to get product review",
-    statusCode: 500,
-  };
-}
 };
 
 // Delete Review
-export const deleteReview = async (id, productId ) => {
-  try{
-  const product = await Product.findById(productId);
+export const deleteReview = async (id, productId) => {
+  try {
+    const product = await Product.findById(productId);
 
-  if (!product) {
-    return{
-      success:false,
-      message: "Product not found",
-      statusCode: 404,
-    } 
-  }
-
-  const reviews = product.reviews.filter(
-    (rev) => rev._id.toString() !== id.toString()
-  );
-
-  let avg = 0;
-
-  reviews.forEach((rev) => {
-    avg += rev.rating;
-  });
-
-  let ratings = 0;
-
-  if (reviews.length === 0) {
-    ratings = 0;
-  } else {
-    ratings = avg / reviews.length;
-  }
-
-  const numOfReviews = reviews.length;
-
-  await Product.findByIdAndUpdate(
-    productId,
-    {
-      reviews,
-      ratings,
-      numOfReviews,
-    },
-    {
-      new: true,
-      runValidators: true,
-      useFindAndModify: false,
+    if (!product) {
+      return {
+        success: false,
+        message: "Product not found",
+        statusCode: 404,
+      };
     }
-  );
 
-  return {
-    success: true,
-  };
-} catch (error) {
-  console.error("Error in delete Product rewiew controller:", error);
-  return {
-    success: false,
-    message: error.message || "Failed to delete product review",
-    statusCode: 500,
-  };
-}
+    const reviews = product.reviews.filter(
+      (rev) => rev._id.toString() !== id.toString()
+    );
+
+    let avg = 0;
+
+    reviews.forEach((rev) => {
+      avg += rev.rating;
+    });
+
+    let ratings = 0;
+
+    if (reviews.length === 0) {
+      ratings = 0;
+    } else {
+      ratings = avg / reviews.length;
+    }
+
+    const numOfReviews = reviews.length;
+
+    await Product.findByIdAndUpdate(
+      productId,
+      {
+        reviews,
+        ratings,
+        numOfReviews,
+      },
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in delete Product rewiew controller:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to delete product review",
+      statusCode: 500,
+    };
+  }
 };

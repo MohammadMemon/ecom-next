@@ -73,6 +73,9 @@ const config = {
       },
       screens: {
         "custom": "1080px",
+        "xs": "480px",
+        "xxs":"415px"
+
       },
     },
   },

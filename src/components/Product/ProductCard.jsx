@@ -19,7 +19,23 @@ const ProductCard = ({ product, index }) => {
       ),
     });
   };
-  const imgUrl = `https://res.cloudinary.com/dbm7kxnub/image/upload/c_crop,x_0,y_170,w_990,h_1132/c_crop,g_auto,w_990,h_990/v1737841333/${product.images[0].public_id}`;
+
+  let imgUrl = "/fallback-image.jpg";
+
+  try {
+    if (product.images && product.images.length > 0) {
+      imgUrl = `https://res.cloudinary.com/dbm7kxnub/image/upload/c_crop,x_0,y_170,w_990,h_1132/c_crop,g_auto,w_990,h_990/v1737841333/${product.images[0].public_id}`;
+    } else {
+      throw new Error("No image found");
+    }
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(
+        `Image loading error for product ID: ${product._id}`,
+        error
+      );
+    }
+  }
 
   return (
     <Link href={`product/${product._id}`} className="block">
@@ -48,7 +64,10 @@ const ProductCard = ({ product, index }) => {
           </div>
 
           <p className="mt-1 text-sm font-semibold text-primary md:text-lg">
-            ₹{product.price}
+            ₹
+            {product.price > 0
+              ? product.price
+              : product.variants?.[0]?.options?.[0]?.price ?? "N/A"}
           </p>
 
           {/* Add to Cart Button */}

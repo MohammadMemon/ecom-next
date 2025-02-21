@@ -1,20 +1,21 @@
 "use client";
+
 import Hero from "@/components/Home/Hero";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/utils/supabase/client";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function Home() {
+function SearchParamsHandler() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    console.log;
     const loginSuccess = searchParams.get("loggedIn");
     const passwordResetSuccess = searchParams.get("passwordReset");
+
     if (loginSuccess === "true") {
       setTimeout(() => {
         toast({
@@ -27,6 +28,7 @@ export default function Home() {
         window.history.replaceState({}, "", pathname);
       }
     }
+
     if (passwordResetSuccess === "true") {
       setTimeout(() => {
         toast({
@@ -41,6 +43,12 @@ export default function Home() {
       }
     }
   }, [searchParams, pathname, toast]);
+
+  return null; // No UI, just handling effects
+}
+
+export default function Home() {
+  const [loading, setLoading] = useState(false);
 
   const logout = async () => {
     setLoading(true);
@@ -58,19 +66,26 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   return (
-    <div className="flex flex-col items-center justify-center text-2xl font-bold bg-muted">
-      <Hero />
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          logout();
-        }}
-      >
-        <Button className="m-2 " type="submit" disabled={loading}>
-          {loading ? "Logging out..." : "Logout"}
-        </Button>
-      </form>
-    </div>
+    <>
+      <Suspense fallback={null}>
+        <SearchParamsHandler />
+      </Suspense>
+
+      <div className="flex flex-col items-center justify-center text-2xl font-bold bg-muted">
+        <Hero />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            logout();
+          }}
+        >
+          <Button className="m-2" type="submit" disabled={loading}>
+            {loading ? "Logging out..." : "Logout"}
+          </Button>
+        </form>
+      </div>
+    </>
   );
 }

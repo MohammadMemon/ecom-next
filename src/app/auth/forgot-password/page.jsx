@@ -1,32 +1,24 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { forgotPassword } from "./actions";
 import { Label } from "@/components/ui/label";
 
-export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+function ErrorHandler() {
   const { toast } = useToast();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const response = await forgotPassword(email);
-    console.log(response.error);
-    console.log(error);
-  };
   useEffect(() => {
-    setLoading(false);
     const error = searchParams.get("error");
     if (error) {
-      console.log(encodeURIComponent(error));
+      console.log("Encoded error:", encodeURIComponent(error));
+
       setTimeout(() => {
         toast({
           variant: "destructive",
@@ -34,26 +26,59 @@ export default function ForgotPassword() {
           description: "Something went wrong. Please try again later.",
         });
       }, 300);
+
       window.history.replaceState({}, "", pathname);
     }
-  }, [searchParams]);
+  }, [searchParams, pathname, toast]);
+
+  return null; // No UI, just handles errors
+}
+
+export default function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await forgotPassword(email);
+      if (response.error) {
+        console.error("Error:", response.error);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center gap-6 p-6 min-h-svh bg-muted md:p-10">
-      <div className="flex flex-col w-full max-w-sm gap-6">
-        <a href="/" className="flex items-center self-center gap-2 font-medium">
-          <div className="flex items-center justify-center w-6 h-6 rounded-md text-primary-foreground">
-            {/* logo daal */}
-          </div>
-          Cycledaddy
-        </a>
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Forgot Password</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit}>
-                <div className="grid gap-6">
+    <>
+      <Suspense fallback={null}>
+        <ErrorHandler />
+      </Suspense>
+
+      <div className="flex flex-col items-center justify-center gap-6 p-6 min-h-svh bg-muted md:p-10">
+        <div className="flex flex-col w-full max-w-sm gap-6">
+          <a
+            href="/"
+            className="flex items-center self-center gap-2 font-medium"
+          >
+            <div className="flex items-center justify-center w-6 h-6 rounded-md text-primary-foreground">
+              {/* logo */}
+            </div>
+            Cycledaddy
+          </a>
+          <div className="flex flex-col gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Forgot Password</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit}>
                   <div className="grid gap-6">
                     <div className="grid gap-2">
                       <Label htmlFor="email">Email</Label>
@@ -74,12 +99,12 @@ export default function ForgotPassword() {
                       </Button>
                     </div>
                   </div>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

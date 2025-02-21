@@ -1,111 +1,130 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { resetPassword } from "./actions";
 import { Eye, EyeOff } from "lucide-react";
+
+function SearchParamsHandler({ toast }) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+
+    if (error) {
+      setTimeout(() => {
+        toast({
+          variant: "destructive",
+          title:
+            error === "Invalid Password"
+              ? "Invalid Password"
+              : "Unexpected Error",
+          description:
+            error === "Invalid Password"
+              ? "Password must be 8-16 characters long, contain at least one lowercase letter, one uppercase letter, one number, and one special character (e.g., @$!%*?&)."
+              : "Something went wrong. Please try again later.",
+        });
+      }, 300);
+
+      // Remove error from URL after displaying toast
+      window.history.replaceState({}, "", pathname);
+    }
+  }, [searchParams, toast, pathname]);
+
+  return null; // No UI needed, just effect handling
+}
 
 export default function ForgotPassword() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const response = await resetPassword(password);
-    console.log(response.error);
-    console.log(error);
-  };
-  useEffect(() => {
-    setLoading(false);
-    const error = searchParams.get("error");
-    if (error) {
-      console.log();
-      if (decodeURIComponent(error) == "Invalid Password") {
-        setTimeout(() => {
-          toast({
-            variant: "destructive",
-            title: "Invalid Password",
-            description:
-              "Password must be 8-16 characters long, contain at least one lowercase letter, one uppercase letter, one number, and one special character (e.g., @$!%*?&).",
-          });
-        }, 300);
-        window.history.replaceState({}, "", pathname);
+
+    try {
+      const response = await resetPassword(password);
+
+      if (response?.error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: response.error,
+        });
       } else {
-        setTimeout(() => {
-          toast({
-            variant: "destructive",
-            title: "Unexpected Error Occurred",
-            description: "Something went wrong. Please try again later.",
-          });
-        }, 300);
-        window.history.replaceState({}, "", pathname);
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Your password has been updated successfully.",
+        });
       }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
-  }, [searchParams]);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-6 min-h-svh bg-muted md:p-10">
+      <Suspense fallback={null}>
+        <SearchParamsHandler toast={toast} />
+      </Suspense>
+
       <div className="flex flex-col w-full max-w-sm gap-6">
         <a href="/" className="flex items-center self-center gap-2 font-medium">
           <div className="flex items-center justify-center w-6 h-6 rounded-md text-primary-foreground">
-            {/* logo daal */}
+            {/* logo placeholder */}
           </div>
           Cycledaddy
         </a>
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Update Password</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit}>
-                <div className="grid gap-6">
-                  <div className="grid gap-6">
-                    <div className="grid gap-2 relative">
-                      <Label htmlFor="password">Update Password</Label>
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Password@123"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="pr-10" // Add padding to prevent text overlap with icon
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-full  text-gray-500 hover:text-gray-700"
-                      >
-                        {showPassword ? (
-                          <EyeOff size={20} />
-                        ) : (
-                          <Eye size={20} />
-                        )}
-                      </button>
 
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={loading}
-                      >
-                        {loading ? "Loading..." : "Update Password"}
-                      </Button>
-                    </div>
-                  </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Update Password</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-6">
+                <div className="relative grid gap-2">
+                  <Label htmlFor="password">Update Password</Label>
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password@123"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute text-gray-500 transform -translate-y-full right-3 top-1/2 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Loading..." : "Update Password"}
+                  </Button>
                 </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

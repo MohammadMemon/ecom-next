@@ -60,7 +60,6 @@ export const createProduct = async (req) => {
 };
 
 // Get All Product
-
 export const getAllProducts = async (queryParams) => {
   try {
     //paginationn

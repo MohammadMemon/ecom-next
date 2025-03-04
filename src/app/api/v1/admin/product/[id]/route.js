@@ -39,6 +39,7 @@ export async function PUT(req, { params }) {
     );
   }
 }
+//Delete Product
 export async function DELETE(req, { params }) {
   await dbConnect(); // Ensure DB connection
 

@@ -2,13 +2,14 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ShoppingCart, User, Search } from "lucide-react";
+import Image from "next/image";
 
 const Navbar = () => {
   // State for menu visibility
   const [isOpen, setIsOpen] = useState(false);
-  // State for tracking opened categories and subcategories
+  // State for tracking opened categories and subCategories
   const [openCategories, setOpenCategories] = useState(new Set());
-  const [openSubCategories, setOpenSubCategories] = useState(new Set());
+  const [opensubCategories, setOpensubCategories] = useState(new Set());
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -26,85 +27,342 @@ const Navbar = () => {
   // Navigation data
   const categories = [
     {
-      name: "Bikes",
-      href: "/bikes",
-      subcategories: [
-        {
-          name: "Mountain Bikes",
-          href: "/bikes/mountain",
-          subSubcategories: [
-            {
-              name: "Full Suspension",
-              href: "/bikes/mountain/full-suspension",
-            },
-            { name: "Hardtail", href: "/bikes/mountain/hardtail" },
-            { name: "Electric", href: "/bikes/mountain/electric" },
-          ],
-        },
-        {
-          name: "Road Bikes",
-          href: "/bikes/road",
-          subSubcategories: [
-            { name: "Racing", href: "/bikes/road/racing" },
-            { name: "Gravel", href: "/bikes/road/gravel" },
-            { name: "Touring", href: "/bikes/road/touring" },
-          ],
-        },
-      ],
+      name: "Bike",
+      href: "/category/bike",
     },
     {
       name: "Gears & Chains",
-      href: "/components",
-      subcategories: [
+      href: "/category/gears-and-chains",
+      subCategories: [
         {
-          name: "Drivetrain",
-          href: "/components/drivetrain",
-          subSubcategories: [
-            { name: "Chains", href: "/components/drivetrain/chains" },
-            { name: "Cassettes", href: "/components/drivetrain/cassettes" },
-            { name: "Derailleurs", href: "/components/drivetrain/derailleurs" },
+          name: "Drivetrain Components",
+          href: "/category/gears-and-chains/drivetrain-components",
+          subSubCategories: [
+            {
+              name: "Chains",
+              href: "/category/gears-and-chains/drivetrain-components/chains",
+            },
+            {
+              name: "Chainwheel & Cranks",
+              href: "/category/gears-and-chains/drivetrain-components/chainwheel-and-cranks",
+            },
+            {
+              name: "Derailleurs",
+              href: "/category/gears-and-chains/drivetrain-components/derailleurs",
+            },
+            {
+              name: "Derailleur Dropouts",
+              href: "/category/gears-and-chains/drivetrain-components/derailleur-dropouts",
+            },
+            {
+              name: "Freewheels",
+              href: "/category/gears-and-chains/drivetrain-components/freewheels",
+            },
+            {
+              name: "Groupset",
+              href: "/category/gears-and-chains/drivetrain-components/groupset",
+            },
           ],
         },
         {
-          name: "Brakes",
-          href: "/components/brakes",
-          subSubcategories: [
-            { name: "Disc Brakes", href: "/components/brakes/disc" },
-            { name: "Brake Pads", href: "/components/brakes/pads" },
-            { name: "Cables", href: "/components/brakes/cables" },
+          name: "Shifting & Braking",
+          href: "/category/gears-and-chains/shifting-and-braking",
+          subSubCategories: [
+            {
+              name: "Shifters",
+              href: "/category/gears-and-chains/shifting-and-braking/shifters",
+            },
+            {
+              name: "Brake Levers",
+              href: "/category/gears-and-chains/shifting-and-braking/brake-levers",
+            },
           ],
         },
+        {
+          name: "Pedals & Cleats",
+          href: "/category/gears-and-chains/pedals-and-cleats",
+        },
+        { name: "B.B. Sets", href: "/category/gears-and-chains/bb-sets" },
       ],
     },
     {
       name: "Wheels & Suspension",
-      href: "/components",
-      subcategories: [
+      href: "/category/wheels-and-suspension",
+      subCategories: [
         {
-          name: "Mountain Bikes",
-          href: "/bikes/mountain",
+          name: "Wheels & Hubs",
+          href: "/category/wheels-and-suspension/wheels-and-hubs",
+          subSubCategories: [
+            {
+              name: "Alloy Hubs",
+              href: "/category/wheels-and-suspension/wheels-and-hubs/alloy-hubs",
+            },
+            {
+              name: "Rims",
+              href: "/category/wheels-and-suspension/wheels-and-hubs/rims",
+            },
+            {
+              name: "Spokes",
+              href: "/category/wheels-and-suspension/wheels-and-hubs/spokes",
+            },
+            {
+              name: "Quick Release",
+              href: "/category/wheels-and-suspension/wheels-and-hubs/quick-release",
+            },
+            {
+              name: "Hubs",
+              href: "/category/wheels-and-suspension/wheels-and-hubs/hubs",
+            },
+          ],
+        },
+        {
+          name: "Suspension Systems",
+          href: "/category/wheels-and-suspension/suspension-systems",
+          subSubCategories: [
+            {
+              name: "Suspension Forks",
+              href: "/category/wheels-and-suspension/suspension-systems/suspension-forks",
+            },
+          ],
+        },
+        {
+          name: "Tyres & Tubes",
+          href: "/category/wheels-and-suspension/tyres-and-tubes",
+          subSubCategories: [
+            {
+              name: "Tyre",
+              href: "/category/wheels-and-suspension/tyres-and-tubes/tyre",
+            },
+            {
+              name: "Tubes",
+              href: "/category/wheels-and-suspension/tyres-and-tubes/tubes",
+            },
+          ],
+        },
+        {
+          name: "Carbon Wheels & Accessories",
+          href: "/category/wheels-and-suspension/carbon-wheels-and-accessories",
+          subSubCategories: [
+            {
+              name: "Carbon Wheels",
+              href: "/category/wheels-and-suspension/carbon-wheels-and-accessories/carbon-wheels",
+            },
+            {
+              name: "Rim Tapes",
+              href: "/category/wheels-and-suspension/carbon-wheels-and-accessories/rim-tapes",
+            },
+          ],
         },
       ],
     },
     {
       name: "Brakes",
-      href: "/components",
+      href: "/category/brakes-and-safety",
+      subCategories: [
+        {
+          name: "Braking Systems",
+          href: "/category/brakes-and-safety/braking-systems",
+          subSubCategories: [
+            {
+              name: "Brake Set",
+              href: "/category/brakes-and-safety/braking-systems/brake-set",
+            },
+            {
+              name: "Hydraulic Brake Set",
+              href: "/category/brakes-and-safety/braking-systems/hydraulic-brake-set",
+            },
+            {
+              name: "Wires & Cables",
+              href: "/category/brakes-and-safety/braking-systems/wires-and-cables",
+            },
+            {
+              name: "Brake Levers",
+              href: "/category/brakes-and-safety/braking-systems/brake-levers",
+            },
+          ],
+        },
+        {
+          name: "Safety Gear",
+          href: "/category/brakes-and-safety/safety-gear",
+          subSubCategories: [
+            {
+              name: "Helmets",
+              href: "/category/brakes-and-safety/safety-gear/helmets",
+            },
+            {
+              name: "Lights",
+              href: "/category/brakes-and-safety/safety-gear/lights",
+            },
+            {
+              name: "Mirrors",
+              href: "/category/brakes-and-safety/safety-gear/mirrors",
+            },
+            {
+              name: "Locks",
+              href: "/category/brakes-and-safety/safety-gear/locks",
+            },
+          ],
+        },
+      ],
     },
     {
-      name: "Components ",
-      href: "/components",
+      name: "Frames",
+      href: "/category/frames-and-components",
+      subCategories: [
+        {
+          name: "Frame Attachments",
+          href: "/category/frames-and-components/frame-attachments",
+          subSubCategories: [
+            {
+              name: "Chain Guard",
+              href: "/category/frames-and-components/frame-attachments/chain-guard",
+            },
+            {
+              name: "Kick Stands",
+              href: "/category/frames-and-components/frame-attachments/kick-stands",
+            },
+            {
+              name: "Seat Post & Clamps",
+              href: "/category/frames-and-components/frame-attachments/seat-post-and-clamps",
+            },
+          ],
+        },
+        {
+          name: "Steering Components",
+          href: "/category/frames-and-components/steering-components",
+          subSubCategories: [
+            {
+              name: "Handle Bar",
+              href: "/category/frames-and-components/steering-components/handle-bar",
+            },
+            {
+              name: "Handle Grips",
+              href: "/category/frames-and-components/steering-components/handle-grips",
+            },
+            {
+              name: "Handle Stem",
+              href: "/category/frames-and-components/steering-components/handle-stem",
+            },
+          ],
+        },
+        {
+          name: "Headsets",
+          href: "/category/frames-and-components/headsets",
+        },
+        { name: "Saddles", href: "/category/frames-and-components/saddles" },
+      ],
     },
     {
       name: "Accessories",
-      href: "/components",
+      href: "/category/accessories-and-essentials",
+      subCategories: [
+        {
+          name: "Cycling Essentials",
+          href: "/category/accessories-and-essentials/cycling-essentials",
+          subSubCategories: [
+            {
+              name: "Air Pumps",
+              href: "/category/accessories-and-essentials/cycling-essentials/air-pumps",
+            },
+            {
+              name: "Bottles & Cages",
+              href: "/category/accessories-and-essentials/cycling-essentials/bottles-and-cages",
+            },
+            {
+              name: "Mudguards",
+              href: "/category/accessories-and-essentials/cycling-essentials/mudguards",
+            },
+          ],
+        },
+        {
+          name: "Storage & Travel",
+          href: "/category/accessories-and-essentials/storage-and-travel",
+          subSubCategories: [
+            {
+              name: "Bags & Travel Cases",
+              href: "/category/accessories-and-essentials/storage-and-travel/bags-and-travel-cases",
+            },
+            {
+              name: "Carriers",
+              href: "/category/accessories-and-essentials/storage-and-travel/carriers",
+            },
+            {
+              name: "Baby Seats",
+              href: "/category/accessories-and-essentials/storage-and-travel/baby-seats",
+            },
+          ],
+        },
+        {
+          name: "Riding Accessories",
+          href: "/category/accessories-and-essentials/riding-accessories",
+          subSubCategories: [
+            {
+              name: "Handle Bar Tapes",
+              href: "/category/accessories-and-essentials/riding-accessories/handle-bar-tapes",
+            },
+            {
+              name: "Clothing & Accessories",
+              href: "/category/accessories-and-essentials/riding-accessories/clothing-and-accessories",
+            },
+            {
+              name: "Cycling Shoes",
+              href: "/category/accessories-and-essentials/riding-accessories/cycling-shoes",
+            },
+          ],
+        },
+        {
+          name: "Tools & Maintenance",
+          href: "/category/accessories-and-essentials/tools-and-maintenance",
+          subSubCategories: [
+            {
+              name: "Bike Tools",
+              href: "/category/accessories-and-essentials/tools-and-maintenance/bike-tools",
+            },
+            {
+              name: "Maintenance",
+              href: "/category/accessories-and-essentials/tools-and-maintenance/maintenance",
+            },
+          ],
+        },
+      ],
     },
     {
       name: "Add-ons",
-      href: "/components",
+      href: "/category/add-ons",
+      subCategories: [
+        {
+          name: "Performance Equipment",
+          href: "/category/add-ons/performance-equipment",
+          subSubCategories: [
+            {
+              name: "Indoor Trainers",
+              href: "/category/category/add-ons/performance-equipment/indoor-trainers",
+            },
+            {
+              name: "Speedometers",
+              href: "/category/add-ons/performance-equipment/speedometers",
+            },
+          ],
+        },
+        {
+          name: "Miscellaneous",
+          href: "/category/add-ons/miscellaneous",
+          subSubCategories: [
+            {
+              name: "Display Stands",
+              href: "/category/add-ons/miscellaneous/display-stands",
+            },
+            {
+              name: "Mobile Consoles",
+              href: "/category/add-ons/miscellaneous/mobile-consoles",
+            },
+          ],
+        },
+      ],
     },
   ];
 
-  // Toggle functions for categories and subcategories
+  // Toggle functions for categories and subCategories
   const toggleCategory = (categoryName, e) => {
     e.preventDefault();
     setOpenCategories((prev) => {
@@ -118,14 +376,14 @@ const Navbar = () => {
     });
   };
 
-  const toggleSubCategory = (subCategoryName, e) => {
+  const togglesubCategories = (subCategoriesName, e) => {
     e.preventDefault();
-    setOpenSubCategories((prev) => {
+    setOpensubCategories((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(subCategoryName)) {
-        newSet.delete(subCategoryName);
+      if (newSet.has(subCategoriesName)) {
+        newSet.delete(subCategoriesName);
       } else {
-        newSet.add(subCategoryName);
+        newSet.add(subCategoriesName);
       }
       return newSet;
     });
@@ -135,7 +393,7 @@ const Navbar = () => {
   const closeMenu = () => {
     setIsOpen(false);
     setOpenCategories(new Set());
-    setOpenSubCategories(new Set());
+    setOpensubCategories(new Set());
   };
 
   return (
@@ -146,7 +404,20 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 text-xl font-bold">
-              LOGO
+              <picture>
+                <source
+                  media="(max-width: 430px)"
+                  width="50"
+                  srcSet="/icon-light.png"
+                />
+                <source media="(min-width: 431px)" srcSet="/cycledaddy3.png" />
+                <Image
+                  src="/cycledaddy3.png"
+                  alt="Logo"
+                  width={200}
+                  height={100}
+                />
+              </picture>
             </Link>
 
             {/* Desktop Navigation */}
@@ -155,30 +426,30 @@ const Navbar = () => {
                 <div key={category.name} className="relative group">
                   <Link
                     href={category.href}
-                    className="hover:text-[#02D866] transition-colors py-2"
+                    className="hover:text-[#02D866] text-m drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)] transition-colors py-2"
                   >
                     {category.name}
                   </Link>
                   {/* Desktop Dropdown */}
                   <div className="absolute left-0 invisible w-48 mt-2 transition-all opacity-0 group-hover:visible group-hover:opacity-100">
-                    {category.subcategories?.length > 0 && (
+                    {category.subCategories?.length > 0 && (
                       <div className="py-2 rounded-lg shadow-lg backdrop-blur-md bg-primary">
-                        {category.subcategories.map((subcategory) => (
+                        {category.subCategories.map((subCategories) => (
                           <div
-                            key={subcategory.name}
+                            key={subCategories.name}
                             className="relative group/sub"
                           >
                             <Link
-                              href={subcategory.href}
+                              href={subCategories.href}
                               className="block px-4 py-2 text-gray-200 hover:text-[#02D866] transition-colors"
                             >
-                              {subcategory.name}
+                              {subCategories.name}
                             </Link>
                             {/* Desktop Sub-Dropdown */}
                             <div className="absolute top-0 invisible w-48 transition-all opacity-0 left-full group-hover/sub:visible group-hover/sub:opacity-100">
-                              {subcategory.subSubcategories?.length > 0 && (
+                              {subCategories.subSubCategories?.length > 0 && (
                                 <div className="py-2 ml-2  rounded-lg shadow-lg backdrop-blur-md bg-[#0A6E45]">
-                                  {subcategory.subSubcategories.map(
+                                  {subCategories.subSubCategories.map(
                                     (subSub) => (
                                       <Link
                                         key={subSub.name}
@@ -275,7 +546,7 @@ const Navbar = () => {
                     >
                       {category.name}
                     </Link>
-                    {category.subcategories?.length > 0 && (
+                    {category.subCategories?.length > 0 && (
                       <button
                         onClick={(e) => toggleCategory(category.name, e)}
                         className="ml-2 p-2 text-gray-300 hover:text-[#02D866] transition-colors"
@@ -286,39 +557,39 @@ const Navbar = () => {
                   </div>
 
                   {openCategories.has(category.name) &&
-                    category.subcategories?.length > 0 && (
+                    category.subCategories?.length > 0 && (
                       <div className="pl-4 	bg-[#0A6E45]">
-                        {category.subcategories.map((subcategory) => (
+                        {category.subCategories.map((subCategories) => (
                           <div
-                            key={subcategory.name}
+                            key={subCategories.name}
                             className="border-t border-primary-foreground "
                           >
                             <div className="flex items-center justify-between px-4 py-2">
                               <Link
-                                href={subcategory.href}
+                                href={subCategories.href}
                                 className="flex-grow text-gray-200 hover:text-[#02D866] transition-colors"
                                 onClick={closeMenu}
                               >
-                                {subcategory.name}
+                                {subCategories.name}
                               </Link>
-                              {subcategory.subSubcategories?.length > 0 && (
+                              {subCategories.subSubCategories?.length > 0 && (
                                 <button
                                   onClick={(e) =>
-                                    toggleSubCategory(subcategory.name, e)
+                                    togglesubCategories(subCategories.name, e)
                                   }
                                   className="ml-2 p-2 text-gray-300 hover:text-[#02D866] transition-colors"
                                 >
-                                  {openSubCategories.has(subcategory.name)
+                                  {opensubCategories.has(subCategories.name)
                                     ? "−"
                                     : "+"}
                                 </button>
                               )}
                             </div>
 
-                            {openSubCategories.has(subcategory.name) &&
-                              subcategory.subSubcategories?.length > 0 && (
+                            {opensubCategories.has(subCategories.name) &&
+                              subCategories.subSubCategories?.length > 0 && (
                                 <div className="pl-4 text-[#100c0c] bg-[#02D866]">
-                                  {subcategory.subSubcategories.map(
+                                  {subCategories.subSubCategories.map(
                                     (subSub) => (
                                       <Link
                                         key={subSub.name}

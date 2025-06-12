@@ -1,6 +1,7 @@
 "use client";
 
 import Hero from "@/components/Home/Hero";
+import RecentlyViewed from "@/components/Home/recentlyViewed";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/utils/supabase/client";
@@ -49,6 +50,22 @@ function SearchParamsHandler() {
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
+  const [hasRecentlyViewed, setHasRecentlyViewed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const exists = localStorage.getItem("recentlyViewedProducts");
+
+      if (exists) {
+        setHasRecentlyViewed(true);
+      } else {
+        setHasRecentlyViewed(false);
+      }
+    } catch (error) {
+      console.error("Invalid recentlyViewedProducts data:", error);
+      setHasRecentlyViewed(false);
+    }
+  }, []);
 
   const logout = async () => {
     setLoading(true);
@@ -75,6 +92,8 @@ export default function Home() {
 
       <div className="flex flex-col items-center justify-center text-2xl font-bold bg-muted">
         <Hero />
+        {hasRecentlyViewed ? <RecentlyViewed /> : null}
+
         <form
           onSubmit={(e) => {
             e.preventDefault();

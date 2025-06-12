@@ -44,7 +44,7 @@ export default function Footer() {
         {/* Top section with logo and social icons */}
         <div className="flex flex-col items-center justify-between gap-4 mb-8 sm:flex-row">
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold">Cycledaddy</span>
+            <span className="text-2xl font-bold">CycleDaddy</span>
           </div>
           <div className="flex gap-4">
             <Link

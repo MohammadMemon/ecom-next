@@ -1,4 +1,4 @@
-import mongoose,  { Schema } from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 
 const productSchema = new Schema({
   name: {
@@ -19,7 +19,7 @@ const productSchema = new Schema({
     type: Number,
     required: [true, "Please Enter Discounted Product Price"],
     maxLength: [6, " Price cannot exceed 6 characters "],
-  },  
+  },
   ratings: {
     type: Number,
     default: 0,
@@ -39,6 +39,12 @@ const productSchema = new Schema({
   category: {
     type: String,
     required: [true, "Please Enter Product Category"],
+  },
+  subCategory: {
+    type: String,
+  },
+  subSubCategory: {
+    type: String,
   },
   tags: {
     type: String,
@@ -96,8 +102,6 @@ if (mongoose.models.Product) {
 
 export default Product;
 
-
-
 // const mongoose = require('mongoose');
 
 // const productSchema = new mongoose.Schema({
@@ -138,7 +142,7 @@ export default Product;
 //   },
 //   specifications: {
 //     type: Map,
-//     of: String,  
+//     of: String,
 //     default: {},
 //   },
 //  variants: [

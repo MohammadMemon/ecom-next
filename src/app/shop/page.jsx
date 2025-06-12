@@ -1,13 +1,12 @@
-// page.js
 import Shop from "./Shop";
 
 async function getProducts() {
-  const res = await fetch("http://localhost:3000/api/v1/products", {
-    cache: "force-cache",
-    next: {
-      tags: ["products"],
-    },
-  });
+  const res = await fetch(
+    "http://localhost:3000/api/v1/products?categorySlug=gears-and-chains",
+    {
+      cache: "force-cache",
+    }
+  );
 
   if (!res.ok) throw new Error("Failed to fetch products");
   const data = await res.json();

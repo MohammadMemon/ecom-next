@@ -24,7 +24,9 @@ const ProductCard = ({ product, index }) => {
 
   try {
     if (product.images && product.images.length > 0) {
-      imgUrl = `https://res.cloudinary.com/dbm7kxnub/image/upload/c_crop,x_0,y_170,w_990,h_1132/c_crop,g_auto,w_990,h_990/v1737841333/${product.images[0].public_id}`;
+      imgUrl = `https://res.cloudinary.com/dbm7kxnub/image/upload/c_crop,x_0,y_170,w_990,h_1132/c_crop,g_auto,w_990,h_990/v1737841333/${product.images[0].public_id}  `;
+    } else if (product.images) {
+      imgUrl = `https://res.cloudinary.com/dbm7kxnub/image/upload/c_crop,x_0,y_170,w_990,h_1132/c_crop,g_auto,w_990,h_990/v1737841333/${product.images.public_id} `;
     } else {
       throw new Error("No image found");
     }
@@ -38,7 +40,7 @@ const ProductCard = ({ product, index }) => {
   }
 
   return (
-    <Link href={`product/${product._id}`} className="block">
+    <Link href={`/product/${product._id}`} className="block">
       <div className="p-1 sm:p-3 bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 max-w-[220px] sm:max-w-[250px] md:max-w-[280px] flex flex-col h-[330px] xxs:[345px] xs:h-[360px] sm:h-[380px] md:h-[430px]">
         {/* Product Image */}
         <div className="relative flex items-center w-full pt-[100%] justify-center">

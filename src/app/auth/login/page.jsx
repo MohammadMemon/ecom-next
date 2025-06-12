@@ -9,9 +9,10 @@ export default function LoginPage() {
         <a href="/" className="flex items-center self-center gap-2 font-medium">
           <div className="flex items-center justify-center w-6 h-6 rounded-md text-primary-foreground">
             <Image
-              src="/logo.svg"
+              src="/logo.png"
               alt="Logo"
-              fill
+              height={1200}
+              width={1200}
               className="rounded-lg "
               priority
             ></Image>

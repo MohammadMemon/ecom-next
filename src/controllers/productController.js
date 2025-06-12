@@ -63,7 +63,7 @@ export const createProduct = async (req) => {
 export const getAllProducts = async (queryParams) => {
   try {
     //paginationn
-    const resultPerPage = 200;
+    const resultPerPage = 350;
     //counting total
     const productsCount = await Product.countDocuments();
 

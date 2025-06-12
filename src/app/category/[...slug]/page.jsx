@@ -27,14 +27,6 @@ export default async function Page({ params }) {
     next: { tags: [subSubCategorySlug || subCategorySlug || categorySlug] },
   });
 
-  // const res = await fetch(
-  //   `${process.env.API_BASE_URL}/api/v1/products?categorySlug=${categorySlug}${
-  //     subCategorySlug ? `&subCategorySlug=${subCategorySlug}` : ""
-  //   }${subSubCategorySlug ? `&subSubCategorySlug=${subSubCategorySlug}` : ""}`,
-  //   {
-  //     next: { tags: [subSubCategorySlug || subCategorySlug || categorySlug] },
-  //   }
-  // );
   const data = await res.json();
 
   const products = data.products || [];

@@ -402,7 +402,6 @@ const Navbar = () => {
       <div className="mx-4 my-2 font-bold text-black border rounded-lg shadow-lg backdrop-blur-md bg-white/30 ">
         <div className="px-4 mx-auto max-w-7xl">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
             <Link href="/" className="flex-shrink-0 text-xl font-bold">
               <picture>
                 <source
@@ -410,7 +409,6 @@ const Navbar = () => {
                   width="50"
                   srcSet="/icon-light.png"
                 />
-                <source media="(min-width: 431px)" srcSet="/cycledaddy3.png" />
                 <Image
                   src="/cycledaddy3.png"
                   alt="Logo"

@@ -41,14 +41,14 @@ const ProductCard = ({ product, index }) => {
 
   return (
     <Link href={`/product/${product._id}`} className="block">
-      <div className="p-1 sm:p-3 bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 max-w-[220px] sm:max-w-[250px] md:max-w-[280px] flex flex-col h-[330px] xxs:[345px] xs:h-[360px] sm:h-[380px] md:h-[430px]">
+      <div className="p-1 sm:p-3 backdrop-blur-md bg-white/60 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 max-w-[220px] sm:max-w-[250px] md:max-w-[280px] flex flex-col h-[330px] xxs:[345px] xs:h-[360px] sm:h-[380px] md:h-[430px]">
         {/* Product Image */}
         <div className="relative flex items-center w-full pt-[100%] justify-center">
           <Image
             src={imgUrl}
             alt={product.name}
             fill
-            className="absolute inset-0 object-cover rounded-t-lg"
+            className="absolute inset-0 object-cover rounded-lg"
             sizes="(max-width: 280px) 100vw, 280px"
             priority={index < 8}
           />

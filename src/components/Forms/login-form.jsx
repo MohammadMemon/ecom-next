@@ -9,7 +9,6 @@ import React, { useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams, usePathname, redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
 import { Eye, EyeOff } from "lucide-react";
 
 export function LoginForm({ className, ...props }) {
@@ -33,18 +32,6 @@ export function LoginForm({ className, ...props }) {
   const handleGoogleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        queryParams: {
-          access_type: "offline",
-          prompt: "consent",
-        },
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      },
-    });
 
     if (error) {
       console.error("OAuth error:", error);

@@ -1,12 +1,13 @@
 import dbConnect from "@/lib/dbConnect";
 import { newOrder } from "@/controllers/orderController";
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+
+//Auth needed
 
 export async function POST(req) {
   try {
     await dbConnect();
-    const supabase = await createClient();
+
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.split("Bearer ")[1];
 
@@ -23,17 +24,6 @@ export async function POST(req) {
     if (!token) {
       return NextResponse.json(
         { success: false, message: "No token provided" },
-        { status: 401 }
-      );
-    }
-
-    // Pass token to getUser
-    const { data, error } = await supabase.auth.getUser(token);
-
-    if (error) {
-      console.error("Supabase auth error:", error);
-      return NextResponse.json(
-        { success: false, message: `Authentication error: ${error.message}` },
         { status: 401 }
       );
     }

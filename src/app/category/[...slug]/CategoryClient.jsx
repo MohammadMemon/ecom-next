@@ -19,8 +19,8 @@ export default function CategoryClient({
       <div>
         <h1>
           Showing: {categorySlug}
-          {subCategorySlug && ` -> ${subCategorySlug}`}
-          {subSubCategorySlug && ` -> ${subSubCategorySlug}`}
+          {subCategorySlug && ` → ${subCategorySlug}`}
+          {subSubCategorySlug && ` → ${subSubCategorySlug}`}
         </h1>
       </div>
       <h1 className="mb-6 text-2xl font-bold text-center underline">

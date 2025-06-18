@@ -12,7 +12,7 @@ import { Eye, EyeOff } from "lucide-react";
 import {
   getAuth,
   signInWithPopup,
-  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { googleProvider } from "@/firebase/client";
 import { useRouter } from "next/navigation";
@@ -30,39 +30,36 @@ export function LoginForm({ className, ...props }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const provider = googleProvider();
     const auth = getAuth();
+
     try {
-      const result = createUserWithEmailAndPassword(auth, email, password).then(
-        (userCredential) => {
-          const user = userCredential.user;
-        }
+      // Added await here - this was missing!
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
       );
+      const user = userCredential.user;
 
-      const user = result.user;
+      console.log("Logged in successfully:", user.uid);
 
-      // Check if user is new (first time login)
-      const isNewUser = result._tokenResponse?.isNewUser || false;
-
-      if (isNewUser) {
-        const idToken = await user.getIdToken();
-        await fetch("/api/v1/admin/auth/set-role/new-user", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ uid: user.uid }),
-        });
-      }
       router.push("/auth/authtest");
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorCode, errorMessage);
+
+      // Show error toast
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Invalid email or password. Please try again.",
+      });
+    } finally {
+      // This ensures loading is always set to false
+      setLoading(false);
     }
   };
-
   const handleGoogleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);

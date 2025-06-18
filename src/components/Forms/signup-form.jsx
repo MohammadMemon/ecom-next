@@ -13,7 +13,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   signInWithPopup,
-} from "firebase/auth"; // ✅ Added signInWithPopup
+} from "firebase/auth";
 import { googleProvider } from "@/firebase/client";
 import { useRouter } from "next/navigation";
 
@@ -71,7 +71,6 @@ export function SignupForm({ className, ...props }) {
     }
 
     try {
-      // ✅ Fixed: Proper async/await usage
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,

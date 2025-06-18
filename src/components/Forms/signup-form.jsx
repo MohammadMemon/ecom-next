@@ -7,12 +7,14 @@ import { Label } from "@/components/ui/label";
 import React, { Suspense, useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
-import { useSearchParams, usePathname, redirect } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  sendEmailVerification,
   signInWithPopup,
+  updateProfile,
 } from "firebase/auth";
 import { googleProvider } from "@/firebase/client";
 import { useRouter } from "next/navigation";
@@ -45,6 +47,7 @@ export function SignupForm({ className, ...props }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const displayName = name;
 
     const auth = getAuth();
 
@@ -79,34 +82,34 @@ export function SignupForm({ className, ...props }) {
       const user = userCredential.user;
 
       console.log("User created successfully:", user.uid);
+      await updateProfile(userCredential.user, {
+        displayName: displayName,
+      });
 
-      const isNewUser = true;
+      sendEmailVerification(auth.currentUser);
 
-      if (isNewUser) {
-        try {
-          const idToken = await user.getIdToken();
-          console.log("Setting user role...");
+      try {
+        const idToken = await user.getIdToken();
 
-          const response = await fetch("/api/v1/admin/auth/set-role/new-user", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ uid: user.uid }),
-          });
+        const response = await fetch("/api/v1/admin/auth/set-role/new-user", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ uid: user.uid }),
+        });
 
-          if (!response.ok) {
-            console.error("Failed to set user role:", response.status);
-          } else {
-            console.log("User role set successfully");
-          }
-        } catch (roleError) {
-          console.error("Error setting user role:", roleError);
+        if (!response.ok) {
+          console.error("Failed to set user role:", response.status);
+        } else {
+          console.log("User role set successfully");
         }
-
-        router.push("/auth/authtest");
+      } catch (roleError) {
+        console.error("Error setting user role:", roleError);
       }
+
+      router.push("/auth/authtest");
 
       toast({
         title: "Account Created",

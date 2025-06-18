@@ -479,7 +479,7 @@ const Navbar = () => {
                 <Search className="w-6 h-6" />
               </Link>
               <Link
-                href="/account"
+                href="/auth/authtest"
                 className="hover:text-[#02D866] transition-colors"
               >
                 <User className="w-6 h-6" />

@@ -23,7 +23,6 @@ const Hero = () => {
   ];
 
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [displayText, setDisplayText] = useState("");
 
   useEffect(() => {
     const currentWord = words[currentWordIndex];
@@ -99,6 +98,42 @@ const Hero = () => {
             <SwiperSlide>
               <Image
                 src="/3.png"
+                alt="Slide 3"
+                width={1200}
+                height={900}
+                className="object-cover w-full h-full rounded-lg"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <Image
+                src="/4.png"
+                alt="Slide 3"
+                width={1200}
+                height={900}
+                className="object-cover w-full h-full rounded-lg"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <Image
+                src="/5.png"
+                alt="Slide 3"
+                width={1200}
+                height={900}
+                className="object-cover w-full h-full rounded-lg"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <Image
+                src="/6.png"
+                alt="Slide 3"
+                width={1200}
+                height={900}
+                className="object-cover w-full h-full rounded-lg"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <Image
+                src="/7.png"
                 alt="Slide 3"
                 width={1200}
                 height={900}

@@ -2,8 +2,8 @@
 
 import Hero from "@/components/Home/Hero";
 import RecentlyViewed from "@/components/Home/recentlyViewed";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -44,23 +44,21 @@ function SearchParamsHandler() {
     }
   }, [searchParams, pathname, toast]);
 
-  return null; // No UI, just handling effects
+  return null;
 }
 
 export default function Home() {
   const [hasRecentlyViewed, setHasRecentlyViewed] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
       const exists = localStorage.getItem("recentlyViewedProducts");
-      if (exists) {
-        setHasRecentlyViewed(true);
-      } else {
-        setHasRecentlyViewed(false);
-      }
+      setHasRecentlyViewed(!!exists);
     } catch (error) {
       console.error("Invalid recentlyViewedProducts data:", error);
-      setHasRecentlyViewed(false);
+    } finally {
+      setLoading(false); // Mark check as complete
     }
   }, []);
 
@@ -72,7 +70,24 @@ export default function Home() {
 
       <div className="flex flex-col items-center justify-center text-2xl font-bold bg-muted">
         <Hero />
-        {hasRecentlyViewed ? <RecentlyViewed /> : null}
+
+        {loading ? (
+          <div className="h-[300px] w-full" /> // Reserve space during loading
+        ) : hasRecentlyViewed ? (
+          <RecentlyViewed />
+        ) : null}
+        {!loading && (
+          <div className="py-4 mx-4">
+            <Image
+              src="/banner1.png"
+              alt="Slide 2"
+              width={1200}
+              height={900}
+              className="object-cover w-full h-full rounded-lg"
+              priority
+            />
+          </div>
+        )}
       </div>
     </>
   );

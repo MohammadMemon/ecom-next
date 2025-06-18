@@ -2,6 +2,7 @@
 import { LoginForm } from "@/components/Forms/login-form";
 import Image from "next/image";
 import { Suspense } from "react";
+
 export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-6 min-h-svh bg-muted md:p-10">

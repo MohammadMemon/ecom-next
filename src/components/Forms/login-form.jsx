@@ -4,12 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login, oauthLogin } from "@/app/auth/login/actions";
 import React, { useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams, usePathname, redirect } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import {
+  getAuth,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+import { googleProvider } from "@/firebase/client";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({ className, ...props }) {
   const { toast } = useToast();
@@ -20,23 +26,77 @@ export function LoginForm({ className, ...props }) {
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
-
+  const router = useRouter();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const provider = googleProvider();
+    const auth = getAuth();
+    try {
+      const result = createUserWithEmailAndPassword(auth, email, password).then(
+        (userCredential) => {
+          const user = userCredential.user;
+        }
+      );
 
-    const response = await login(email, password);
-    console.log(response.error);
-    console.log(error);
+      const user = result.user;
+
+      // Check if user is new (first time login)
+      const isNewUser = result._tokenResponse?.isNewUser || false;
+
+      if (isNewUser) {
+        const idToken = await user.getIdToken();
+        await fetch("/api/v1/admin/auth/set-role/new-user", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ uid: user.uid }),
+        });
+      }
+      router.push("/auth/authtest");
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode, errorMessage);
+    }
   };
+
   const handleGoogleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const provider = googleProvider();
+    const auth = getAuth();
 
-    if (error) {
-      console.error("OAuth error:", error);
-    } else {
-      console.log("OAuth success data:", data);
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const isNewUser = result._tokenResponse?.isNewUser || false;
+
+      if (isNewUser) {
+        const idToken = await user.getIdToken();
+        await fetch("/api/v1/admin/auth/set-role/new-user", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ uid: user.uid }),
+        });
+      }
+
+      router.push("/auth/authtest");
+    } catch (error) {
+      console.error("Login failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,7 +114,7 @@ export function LoginForm({ className, ...props }) {
               <Button
                 variant="outline"
                 className="bg-red-500 outline-white"
-                onClick={() => redirect("/forgot-password")}
+                onClick={() => router.push("/forgot-password")}
               >
                 Forgot Password?
               </Button>

@@ -157,7 +157,7 @@ export default function ProductDetails({ product }) {
   };
 
   return (
-    <div className="min-h-screen bg-primary-foreground">
+    <div className="bg-primary-foreground">
       <div className="p-4 mx-6 my-1 border rounded-lg shadow-lg backdrop-blur-md bg-white/60 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {/* Image Section */}

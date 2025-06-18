@@ -4,12 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signup } from "@/app/auth/signup/actions";
 import React, { Suspense, useEffect, useState } from "react";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams, usePathname, redirect } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithPopup,
+} from "firebase/auth"; // ✅ Added signInWithPopup
+import { googleProvider } from "@/firebase/client";
+import { useRouter } from "next/navigation";
 
 export function SignupForm({ className, ...props }) {
   const { toast } = useToast();
@@ -18,6 +24,7 @@ export function SignupForm({ className, ...props }) {
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -39,6 +46,9 @@ export function SignupForm({ className, ...props }) {
     e.preventDefault();
     setLoading(true);
 
+    const auth = getAuth();
+
+    // Validation checks
     if (!validateEmail(email)) {
       setLoading(false);
       toast({
@@ -61,19 +71,69 @@ export function SignupForm({ className, ...props }) {
     }
 
     try {
-      const response = await signup(email, password, name);
-      if (response.error) {
-        throw new Error(response.error);
+      // ✅ Fixed: Proper async/await usage
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      console.log("User created successfully:", user.uid);
+
+      const isNewUser = true;
+
+      if (isNewUser) {
+        try {
+          const idToken = await user.getIdToken();
+          console.log("Setting user role...");
+
+          const response = await fetch("/api/v1/admin/auth/set-role/new-user", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ uid: user.uid }),
+          });
+
+          if (!response.ok) {
+            console.error("Failed to set user role:", response.status);
+          } else {
+            console.log("User role set successfully");
+          }
+        } catch (roleError) {
+          console.error("Error setting user role:", roleError);
+        }
+
+        router.push("/auth/authtest");
       }
+
+      toast({
+        title: "Account Created",
+        description: "Your account has been created successfully!",
+      });
     } catch (error) {
-      if (error?.message !== "NEXT_REDIRECT") {
-        toast({
-          variant: "destructive",
-          title: "Signup Failed",
-          description: error.message || "An unexpected error occurred.",
-        });
+      console.error("Signup error:", error);
+
+      let errorMessage = "Something went wrong. Please try again.";
+
+      // Handle specific Firebase errors
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "An account with this email already exists.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Password is too weak.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address.";
       }
+
+      toast({
+        variant: "destructive",
+        title: "Signup Failed",
+        description: errorMessage,
+      });
     } finally {
+      // ✅ Always set loading to false
       setLoading(false);
     }
   };
@@ -82,10 +142,59 @@ export function SignupForm({ className, ...props }) {
     e.preventDefault();
     setLoading(true);
 
-    if (error) {
-      console.error("OAuth error:", error);
-    } else {
-      console.log("OAuth success data:", data);
+    const provider = googleProvider();
+    const auth = getAuth();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      console.log("Google login successful:", user.uid);
+
+      // Check if user is new (first time login)
+      const isNewUser = result._tokenResponse?.isNewUser || false;
+
+      if (isNewUser) {
+        try {
+          const idToken = await user.getIdToken();
+          console.log("Setting user role for Google signup...");
+
+          const response = await fetch("/api/v1/admin/auth/set-role/new-user", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ uid: user.uid }),
+          });
+
+          if (!response.ok) {
+            console.error("Failed to set user role:", response.status);
+          }
+        } catch (roleError) {
+          console.error("Error setting user role:", roleError);
+        }
+      }
+
+      router.push("/auth/authtest");
+    } catch (error) {
+      console.error("Google login failed:", error);
+
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (error.code === "auth/popup-closed-by-user") {
+        errorMessage = "Login cancelled.";
+      } else if (error.code === "auth/popup-blocked") {
+        errorMessage = "Popup blocked. Please allow popups for this site.";
+      }
+
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,7 +212,7 @@ export function SignupForm({ className, ...props }) {
               <Button
                 variant="outline"
                 className="bg-red-500 outline-white"
-                onClick={() => redirect("/forgot-password")}
+                onClick={() => router.push("/forgot-password")}
               >
                 Forgot Password?
               </Button>
@@ -126,7 +235,8 @@ export function SignupForm({ className, ...props }) {
         window.history.replaceState({}, "", pathname);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, toast, router, pathname]);
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -169,7 +279,7 @@ export function SignupForm({ className, ...props }) {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="pr-10" // Add padding to prevent text overlap with icon
+                      className="pr-10"
                     />
                     <button
                       type="button"
@@ -180,7 +290,7 @@ export function SignupForm({ className, ...props }) {
                     </button>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Loading..." : "Signup"}
+                    {loading ? "Creating Account..." : "Sign Up"}
                   </Button>
                 </div>
                 <div className="relative text-sm text-center after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -195,13 +305,17 @@ export function SignupForm({ className, ...props }) {
                     disabled={loading}
                     className="w-full"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="w-5 h-5 mr-2"
+                    >
                       <path
                         d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
                         fill="currentColor"
                       />
                     </svg>
-                    {loading ? "Loading..." : "Signup with Google"}
+                    {loading ? "Signing Up..." : "Sign Up with Google"}
                   </Button>
                 </div>
                 <div className="text-sm text-center">
@@ -217,7 +331,7 @@ export function SignupForm({ className, ...props }) {
             </form>
           </CardContent>
         </Card>
-        <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
+        <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
           By clicking continue, you agree to our{" "}
           <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
         </div>

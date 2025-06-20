@@ -47,11 +47,9 @@ export function SignupForm({ className, ...props }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const displayName = name;
-
     const auth = getAuth();
 
-    // Validation checks
+    // Basic client-side validations
     if (!validateEmail(email)) {
       setLoading(false);
       toast({
@@ -74,6 +72,7 @@ export function SignupForm({ className, ...props }) {
     }
 
     try {
+      // Create new user with email/password
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -81,62 +80,58 @@ export function SignupForm({ className, ...props }) {
       );
       const user = userCredential.user;
 
-      console.log("User created successfully:", user.uid);
-      await updateProfile(userCredential.user, {
-        displayName: displayName,
-      });
+      console.log("User created:", user.uid);
 
-      sendEmailVerification(auth.currentUser);
+      // Update display name
+      await updateProfile(user, { displayName: name });
 
+      // Get Firebase ID token
       const idToken = await user.getIdToken();
-      // Set authenticated browser cookies
 
-      const response = await fetch("/api/login", {
+      // Set auth cookies (your /api/login should handle cookie setting)
+      const loginResponse = await fetch("/api/login", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${idToken}`,
           "Content-Type": "application/json",
         },
       });
-      if (!response.ok) {
-        throw new Error("Failed to set auth cookies");
+
+      if (!loginResponse.ok) {
+        throw new Error("Failed to set authentication cookies.");
       }
 
-      router.refresh();
+      // Assign default role (e.g., "user") via custom API
+      const roleResponse = await fetch("/api/v1/admin/auth/set-role/new-user", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ uid: user.uid }),
+      });
 
-      try {
-        const idToken = await user.getIdToken();
-
-        const response = await fetch("/api/v1/admin/auth/set-role/new-user", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ uid: user.uid }),
-        });
-
-        if (!response.ok) {
-          console.error("Failed to set user role:", response.status);
-        } else {
-          console.log("User role set successfully");
-        }
-      } catch (roleError) {
-        console.error("Error setting user role:", roleError);
+      if (!roleResponse.ok) {
+        console.error("Failed to assign role. Status:", roleResponse.status);
       }
 
-      router.push("/auth/authtest");
+      // Send email verification
+      await sendEmailVerification(user);
+      console.log("Verification email sent.");
 
+      // Show toast and redirect
       toast({
         title: "Account Created",
-        description: "Your account has been created successfully!",
+        description:
+          "You have been successfully registered. Please check your inbox to verify your email address.",
       });
+
+      router.push("/auth/check-email");
     } catch (error) {
       console.error("Signup error:", error);
 
       let errorMessage = "Something went wrong. Please try again.";
 
-      // Handle specific Firebase errors
       if (error.code === "auth/email-already-in-use") {
         errorMessage = "An account with this email already exists.";
       } else if (error.code === "auth/weak-password") {

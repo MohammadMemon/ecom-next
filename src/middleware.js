@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { authMiddleware } from "next-firebase-auth-edge/lib/next/middleware";
 
 export async function middleware(request) {
+  console.log("🔥 Middleware triggered for:", request.url);
+
   return authMiddleware(request, {
     loginPath: "/api/login",
     logoutPath: "/api/logout",
@@ -23,6 +25,8 @@ export async function middleware(request) {
 
     handleValidToken: async ({ decodedToken }) => {
       const { pathname } = new URL(request.url);
+      console.log("✅ Valid token for:", decodedToken.uid);
+      console.log("📍 Path:", pathname);
 
       if (pathname.startsWith("/admin") && decodedToken.role !== "admin") {
         return NextResponse.redirect(new URL("/unauthorized", request.url));

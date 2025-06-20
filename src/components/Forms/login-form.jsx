@@ -88,6 +88,22 @@ export function LoginForm({ className, ...props }) {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
+      const idToken = await user.getIdToken();
+
+      // Set authenticated browser cookies
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to set auth cookies");
+      }
+
+      router.refresh();
+
       const isNewUser = result._tokenResponse?.isNewUser || false;
 
       if (isNewUser) {

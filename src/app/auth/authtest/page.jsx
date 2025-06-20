@@ -33,16 +33,23 @@ export default function PrivatePage() {
     return null;
   }
 
-  function handleSignout() {
+  async function handleSignout() {
     const provider = googleProvider();
     const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        router.push("/auth/login");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      await signOut(auth);
+
+      await fetch("/api/logout");
+
+      router.push("/auth/login");
+    } catch (error) {
+      console.log(error);
+    }
+    signOut(auth);
+
+    await fetch("/api/logout");
+
+    router.push("/auth/login");
   }
 
   return (

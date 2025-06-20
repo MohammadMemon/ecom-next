@@ -8,7 +8,12 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
-import { getAuth, updatePassword } from "firebase/auth";
+import {
+  EmailAuthProvider,
+  getAuth,
+  reauthenticateWithCredential,
+  updatePassword,
+} from "firebase/auth";
 import { googleProvider } from "@/firebase/client";
 
 function SearchParamsHandler({ toast }) {
@@ -57,20 +62,35 @@ export default function ForgotPassword() {
 
       const user = auth.currentUser;
 
-      const response = updatePassword(user, password);
+      const credential = EmailAuthProvider.credential(user.email, oldPassword);
 
-      if (response?.error) {
+      const reAuthenticate = await reauthenticateWithCredential(
+        user,
+        credential
+      );
+
+      if (reAuthenticate?.error) {
         toast({
           variant: "destructive",
           title: "Error",
           description: response.error,
         });
       } else {
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Your password has been updated successfully.",
-        });
+        const response = updatePassword(user, password);
+
+        if (response?.error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: response.error,
+          });
+        } else {
+          toast({
+            variant: "success",
+            title: "Success",
+            description: "Your password has been updated successfully.",
+          });
+        }
       }
     } catch (error) {
       console.log(error);

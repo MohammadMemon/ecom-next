@@ -88,6 +88,22 @@ export function SignupForm({ className, ...props }) {
 
       sendEmailVerification(auth.currentUser);
 
+      const idToken = await user.getIdToken();
+      // Set authenticated browser cookies
+
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to set auth cookies");
+      }
+
+      router.refresh();
+
       try {
         const idToken = await user.getIdToken();
 
@@ -135,7 +151,6 @@ export function SignupForm({ className, ...props }) {
         description: errorMessage,
       });
     } finally {
-      // ✅ Always set loading to false
       setLoading(false);
     }
   };
@@ -152,6 +167,23 @@ export function SignupForm({ className, ...props }) {
       const user = result.user;
 
       console.log("Google login successful:", user.uid);
+
+      const idToken = await user.getIdToken();
+
+      // Set authenticated browser cookies
+
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to set auth cookies");
+      }
+
+      router.refresh();
 
       // Check if user is new (first time login)
       const isNewUser = result._tokenResponse?.isNewUser || false;

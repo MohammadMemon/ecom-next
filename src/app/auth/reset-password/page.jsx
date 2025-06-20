@@ -7,8 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
-import { resetPassword } from "./actions";
 import { Eye, EyeOff } from "lucide-react";
+import { getAuth, updatePassword } from "firebase/auth";
+import { googleProvider } from "@/firebase/client";
 
 function SearchParamsHandler({ toast }) {
   const searchParams = useSearchParams();
@@ -31,17 +32,16 @@ function SearchParamsHandler({ toast }) {
               : "Something went wrong. Please try again later.",
         });
       }, 300);
-
-      // Remove error from URL after displaying toast
       window.history.replaceState({}, "", pathname);
     }
   }, [searchParams, toast, pathname]);
 
-  return null; // No UI needed, just effect handling
+  return null;
 }
 
 export default function ForgotPassword() {
   const [password, setPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
@@ -51,7 +51,13 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const response = await resetPassword(password);
+      const provider = googleProvider();
+
+      const auth = getAuth();
+
+      const user = auth.currentUser;
+
+      const response = updatePassword(user, password);
 
       if (response?.error) {
         toast({
@@ -67,10 +73,11 @@ export default function ForgotPassword() {
         });
       }
     } catch (error) {
+      console.log(error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: `${error}`,
       });
     } finally {
       setLoading(false);
@@ -99,6 +106,23 @@ export default function ForgotPassword() {
             <form onSubmit={handleSubmit}>
               <div className="grid gap-6">
                 <div className="relative grid gap-2">
+                  <Label htmlFor="password">Old Password</Label>
+                  <Input
+                    id="oldPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password@123"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    required
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute text-gray-500 transform -translate-y-full right-3 top-1/2 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                   <Label htmlFor="password">Update Password</Label>
                   <Input
                     id="password"

@@ -19,7 +19,7 @@ export default function PrivatePage() {
       } else {
         setUser(user);
         user.getIdTokenResult().then((idTokenResult) => {
-          const role = idTokenResult.claims.role || "user";
+          const role = idTokenResult.claims.role;
           console.log(role);
           user.role = role;
         });

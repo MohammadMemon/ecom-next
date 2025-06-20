@@ -33,13 +33,31 @@ export function LoginForm({ className, ...props }) {
     const auth = getAuth();
 
     try {
-      // Added await here - this was missing!
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
       const user = userCredential.user;
+
+      const idToken = await user.getIdToken();
+
+      // Set authenticated browser cookies
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to set auth cookies");
+      } else {
+        console.log("api called and response is ok");
+      }
+
+      // Refresh page after updating browser cookies
+      router.refresh();
 
       console.log("Logged in successfully:", user.uid);
 

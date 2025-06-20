@@ -31,7 +31,7 @@ function ErrorHandler() {
     }
   }, [searchParams, pathname, toast]);
 
-  return null; // No UI, just handles errors
+  return null;
 }
 
 export default function ForgotPassword() {

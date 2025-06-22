@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { forgotPassword } from "./actions";
 import { Label } from "@/components/ui/label";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { googleProvider } from "@/firebase/client";
 
 function ErrorHandler() {
   const { toast } = useToast();
@@ -42,14 +43,19 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const provider = googleProvider;
+
+    const auth = getAuth();
 
     try {
-      const response = await forgotPassword(email);
+      const response = await sendPasswordResetEmail(auth, email);
       if (response.error) {
         console.error("Error:", response.error);
       }
     } catch (error) {
-      console.error("Unexpected error:", error);
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode + errorMessage);
     } finally {
       setLoading(false);
     }

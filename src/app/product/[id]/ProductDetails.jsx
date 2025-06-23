@@ -24,14 +24,34 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import useCartStore from "@/store/cartStore";
+import { useParams } from "next/navigation";
 
 export default function ProductDetails({ product }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const [api, setApi] = useState();
 
   const { addRecentlyViewed } = useRecentlyViewed();
+
+  const { addItem, updateQuantity, isItemInCart, getItemQuantity } =
+    useCartStore();
+
+  const inCart = isItemInCart(product._id);
+  const currentQuantity = getItemQuantity(product._id);
+
+  const handleAddToCart = () => {
+    if (inCart) {
+      updateQuantity(product._id, currentQuantity + selectedQuantity);
+    } else {
+      // Add multiple items at once
+      for (let i = 0; i < selectedQuantity; i++) {
+        addItem(product);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!product) return;
@@ -304,17 +324,21 @@ export default function ProductDetails({ product }) {
                 </label>
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    onClick={() =>
+                      setSelectedQuantity(Math.max(1, selectedQuantity - 1))
+                    }
                     className="px-3 py-2 text-gray-600 hover:text-gray-800"
                   >
                     -
                   </button>
                   <span className="px-4 py-2 border-gray-300 border-x">
-                    {quantity}
+                    {selectedQuantity}
                   </span>
                   <button
                     onClick={() =>
-                      setQuantity(Math.min(product.stock, quantity + 1))
+                      setSelectedQuantity(
+                        Math.min(product.stock, selectedQuantity + 1)
+                      )
                     }
                     className="px-3 py-2 text-gray-600 hover:text-gray-800"
                   >
@@ -327,39 +351,40 @@ export default function ProductDetails({ product }) {
                 <Button
                   className="flex-1 py-m-2"
                   type="submit"
+                  onClick={handleAddToCart}
                   disabled={product.stock === 0}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  Add to Cart
+                  {inCart
+                    ? `Add ${selectedQuantity} More to Cart`
+                    : `Add ${selectedQuantity} to Cart`}
                 </Button>
-                <Button
+                <button
                   onClick={() => {
                     window.open(
                       `https://wa.me/+917977509402?text=${encodeURIComponent(
                         "Hi, I'm interested in this product: http://cycledaddy.in/product/" +
-                          params.id
+                          useParams.id
                       )}`,
                       "_blank"
                     );
                   }}
-                  variant="outline"
                   size="icon"
-                  className="p-3"
+                  className="p-3 border border-gray-300 rounded-lg "
                 >
                   <img
                     src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/whatsapp.svg"
                     alt="WhatsApp"
                     className="w-5 h-5"
                   />
-                </Button>
-                <Button
+                </button>
+                <button
                   onClick={handleShare}
-                  variant="outline"
                   size="icon"
-                  className="p-3 backdrop-blur-md"
+                  className="p-3 border border-gray-300 rounded-lg"
                 >
                   <Share2 className="w-5 h-5 " />
-                </Button>
+                </button>
               </div>
             </div>
 

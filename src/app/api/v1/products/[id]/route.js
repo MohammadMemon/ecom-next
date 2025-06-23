@@ -17,7 +17,7 @@ export async function GET(req, { params }) {
     return NextResponse.json(result, {
       status: result.statusCode || 200,
       headers: {
-        "x-next-cache-tags": result.product.id,
+        "x-next-cache-tags": result.product._id,
       },
     });
   } catch (error) {

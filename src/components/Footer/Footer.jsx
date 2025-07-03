@@ -38,6 +38,7 @@ const footerLinks = [
 
 export default function Footer() {
   const [question, setQuestion] = useState("");
+
   return (
     <footer className="py-8 text-[#10c0c] border mx-6 my-4 rounded-lg shadow-lg backdrop-blur-md bg-white/30">
       <div className="container max-w-6xl px-4 mx-auto">
@@ -150,11 +151,18 @@ export default function Footer() {
             />
             <Button
               className="bg-[#02D866] text-black border hover:text-white hover:border-white px-6"
-              onClick={() =>
-                (window.location.href = `https://wa.me/917977509402?text=${encodeURIComponent(
-                  `I have a question about: ${question}`
-                )}`)
-              }
+              onClick={() => {
+                <a
+                  href={`https://wa.me/917977509402?text=${encodeURIComponent(
+                    `I have a question about: ${question}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="your-button-classes-here"
+                >
+                  Contact on WhatsApp
+                </a>;
+              }}
             >
               Send
             </Button>

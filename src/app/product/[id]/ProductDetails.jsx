@@ -26,6 +26,8 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import useCartStore from "@/store/cartStore";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProductDetails({ product }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -36,21 +38,26 @@ export default function ProductDetails({ product }) {
 
   const { addRecentlyViewed } = useRecentlyViewed();
 
-  const { addItem, updateQuantity, isItemInCart, getItemQuantity } =
-    useCartStore();
+  const { addItem, isItemInCart } = useCartStore();
 
   const inCart = isItemInCart(product._id);
-  const currentQuantity = getItemQuantity(product._id);
+
+  const { toast } = useToast();
 
   const handleAddToCart = () => {
-    if (inCart) {
-      updateQuantity(product._id, currentQuantity + selectedQuantity);
-    } else {
-      // Add multiple items at once
-      for (let i = 0; i < selectedQuantity; i++) {
-        addItem(product);
-      }
+    // Add multiple items at once
+    for (let i = 0; i < selectedQuantity; i++) {
+      addItem(product);
     }
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+      action: (
+        <Button>
+          <Link href="/cart">Go to Cart</Link>
+        </Button>
+      ),
+    });
   };
 
   useEffect(() => {
@@ -229,7 +236,7 @@ export default function ProductDetails({ product }) {
                     }`}
                   >
                     <img
-                      src={image.url || "/api/placeholder/80/80"}
+                      src={image.url || "/fallback-image.jpg"}
                       alt={`${product.name} view ${index + 1}`}
                       className="object-cover w-full h-full"
                     />
@@ -348,17 +355,31 @@ export default function ProductDetails({ product }) {
               </div>
 
               <div className="flex space-x-3">
-                <Button
-                  className="flex-1 py-m-2"
-                  type="submit"
-                  onClick={handleAddToCart}
-                  disabled={product.stock === 0}
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  {inCart
-                    ? `Add ${selectedQuantity} More to Cart`
-                    : `Add ${selectedQuantity} to Cart`}
-                </Button>
+                {product.stock <= 0 ? (
+                  <Button
+                    className="w-full mt-2 border cursor-not-allowed opacity-60"
+                    disabled
+                  >
+                    Out of Stock
+                  </Button>
+                ) : inCart ? (
+                  <Link href="/cart" className="w-full mt-2">
+                    <Button className="w-full border hover:scale-105">
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Go to Cart
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    className="w-full mt-2 border "
+                    onClick={handleAddToCart}
+                    type="button"
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Add to Cart
+                  </Button>
+                )}
+
                 <button
                   onClick={() => {
                     window.open(

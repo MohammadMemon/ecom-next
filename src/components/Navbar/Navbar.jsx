@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ShoppingCart, User, Search } from "lucide-react";
 import Image from "next/image";
+import useCartStore from "@/store/cartStore";
 
 const Navbar = () => {
   // State for menu visibility
@@ -10,6 +11,9 @@ const Navbar = () => {
   // State for tracking opened categories and subCategories
   const [openCategories, setOpenCategories] = useState(new Set());
   const [opensubCategories, setOpensubCategories] = useState(new Set());
+  const { getTotalItems } = useCartStore();
+
+  const totalItems = getTotalItems();
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -23,7 +27,6 @@ const Navbar = () => {
     };
   }, [isOpen]);
 
-  //understand this
   // Navigation data
   const categories = [
     {
@@ -489,9 +492,11 @@ const Navbar = () => {
                 className="relative hover:text-[#02D866] transition-colors"
               >
                 <ShoppingCart className="w-6 h-6" />
-                <span className="absolute flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 rounded-full animate-pulse -top-2 -right-2">
-                  {/* Add here cart items  */}0
-                </span>
+                {totalItems ? (
+                  <span className="absolute flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 rounded-full animate-pulse -top-2 -right-2">
+                    {totalItems}
+                  </span>
+                ) : null}
               </Link>
               {/* Mobile menu button */}
               <button

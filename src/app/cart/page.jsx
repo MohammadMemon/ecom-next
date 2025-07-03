@@ -4,8 +4,23 @@ import Image from "next/image";
 import { useState } from "react";
 import useCartStore from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { useMounted } from "@/hooks/useMounted";
 
 export default function CartPage() {
+  const isMounted = useMounted();
+
   const {
     items,
     removeItem,
@@ -32,13 +47,20 @@ export default function CartPage() {
       setIsClearing(false);
     }, 500);
   };
+  const { toast } = useToast();
 
-  const handleQuantityChange = (productId, value) => {
-    const quantity = parseInt(value);
-    if (!isNaN(quantity) && quantity >= 0) {
-      updateQuantity(productId, quantity);
-    }
-  };
+  if (!isMounted) {
+    return (
+      <div className="container px-4 py-8 mx-auto">
+        <div className="py-16 text-center">
+          <div className="animate-pulse">
+            <div className="w-48 h-8 mx-auto mb-4 bg-gray-200 rounded"></div>
+            <div className="w-64 h-4 mx-auto bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (summary.isEmpty) {
     return (
@@ -60,13 +82,36 @@ export default function CartPage() {
     <div className="container px-4 py-8 mx-auto ">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Shopping Cart</h1>
-        <button
-          onClick={handleClearCart}
-          disabled={isClearing}
-          className="text-red-600 hover:text-red-800 disabled:opacity-50"
-        >
-          {isClearing ? "Clearing..." : "Clear Cart"}
-        </button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button
+              disabled={isClearing}
+              className="text-red-600 hover:text-red-800 disabled:opacity-50"
+            >
+              {isClearing ? "Clearing..." : "Clear Cart"}
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="bg-primary-foreground">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Clear entire cart?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to remove all items from your cart? Some
+                of them might go out of stock and become unavailable later.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="border border-primary hover:bg-gray-100 bg-primary-foreground">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleClearCart}
+                className="text-white bg-red-600 hover:bg-red-700"
+              >
+                Clear Cart
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 ">
@@ -82,7 +127,7 @@ export default function CartPage() {
                 {items.map((item) => (
                   <div
                     key={item._id}
-                    className="flex flex-col p-4 border rounded-lg border- sm:flex-row sm:items-center sm:gap-4"
+                    className="flex flex-col p-4 border rounded-lg border-primary sm:flex-row sm:items-center sm:gap-4"
                   >
                     {/* First Row (Image + Name) - Expands */}
                     <div className="flex items-center flex-1 gap-4 ">
@@ -138,12 +183,42 @@ export default function CartPage() {
                         <div className="font-semibold">
                           ₹{(item.price * item.quantity).toFixed(2)}
                         </div>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="mt-1 text-sm text-red-600 hover:text-red-800"
-                        >
-                          Remove
-                        </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button className="mt-1 text-sm text-red-600 hover:text-red-800">
+                              Remove
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="bg-primary-foreground">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Remove this product?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to remove this item from
+                                your cart? It might go out of stock and become
+                                unavailable later.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="border border-primary hover:bg-gray-100 bg-primary-foreground">
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => {
+                                  removeItem(item._id);
+                                  toast({
+                                    title: "Removed from Cart",
+                                    description: `${item.name} was removed.`,
+                                  });
+                                }}
+                                className="text-white bg-red-600 hover:bg-red-700"
+                              >
+                                Remove
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </div>

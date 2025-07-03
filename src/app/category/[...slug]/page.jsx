@@ -14,7 +14,8 @@ export default async function Page({ params }) {
   const [categorySlug, subCategorySlug, subSubCategorySlug] = slugParts;
 
   const host = (await headers()).get("host");
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+  const isLocalhost = host?.includes("localhost");
+  const protocol = isLocalhost ? "http" : "https";
 
   const url = new URL(`${protocol}://${host}/api/v1/products`);
   url.searchParams.append("categorySlug", categorySlug);

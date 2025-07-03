@@ -5,20 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import { Analytics } from "@vercel/analytics/next";
-import { initializeApp } from "firebase/app";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDsL04t_fL_6umZI-YqdraNfiTN3uiXekM",
-  authDomain: "cycledaddywebsite.firebaseapp.com",
-  projectId: "cycledaddywebsite",
-  storageBucket: "cycledaddywebsite.firebasestorage.app",
-  messagingSenderId: "1007453859693",
-  appId: "1:1007453859693:web:a4d11af65152657697b464",
-  measurementId: "G-YZS3XNVG5X",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

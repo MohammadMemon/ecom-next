@@ -6,7 +6,7 @@ export default function ShippingReturnsPage() {
       <h2 className="mb-4 text-xl font-semibold">Shipping</h2>
       <ul className="mb-6 space-y-1 list-disc list-inside">
         <li>
-          Standard delivery (7–10 days): ₹100–249 depending on destination and
+          Standard delivery (7–10 days): ₹99-149 depending on destination and
           order value.
         </li>
         <li>Free standard shipping on orders above ₹5,000.</li>

@@ -119,11 +119,17 @@ export default function Footer() {
               <div className="flex items-start gap-2">
                 <label htmlFor="email" className="text-sm text-white">
                   By submitting, I agree with{" "}
-                  <Link href="#" className="text-[#02D866] hover:underline">
+                  <Link
+                    href="/privacy-policy"
+                    className="text-[#02D866] hover:underline"
+                  >
                     Privacy Policy
                   </Link>{" "}
                   and{" "}
-                  <Link href="#" className="text-[#02D866] hover:underline">
+                  <Link
+                    href="/terms-and-conditions"
+                    className="text-[#02D866] hover:underline"
+                  >
                     Terms of Condition
                   </Link>
                 </label>
@@ -144,7 +150,7 @@ export default function Footer() {
           <div className="flex w-full gap-2 md:w-auto">
             <Input
               value={question}
-              onChange={(e) => setQuestion(e.target.value)} // Ensure state is updated
+              onChange={(e) => setQuestion(e.target.value)}
               placeholder="Have a question? Ask us"
               className="text-black border-[#02D866] placeholder:text-gray-500 w-full md:w-[300px]"
             />

@@ -6,6 +6,7 @@ const useCartStore = create(
     (set, get) => ({
       // STATE
       items: [],
+      shippingDetails: null,
 
       // ACTIONS
       addItem: (product) => {
@@ -137,10 +138,57 @@ const useCartStore = create(
           isEmpty: items.length === 0,
         };
       },
+
+      // New shipping details methods
+      setShippingDetails: (details) => {
+        set({ shippingDetails: details });
+      },
+
+      getShippingDetails: () => {
+        return get().shippingDetails;
+      },
+
+      clearShippingDetails: () => {
+        set({ shippingDetails: null });
+      },
+
+      // Complete order method (clears cart and shipping details)
+      completeOrder: () => {
+        set({
+          items: [],
+          shippingDetails: null,
+        });
+      },
+
+      getOrderData: () => {
+        const cartSummary = get().getCartSummary();
+        const shippingDetails = get().shippingDetails;
+
+        const subtotal = cartSummary.totalPrice;
+
+        let shipping = 149;
+        if (subtotal >= 5000) {
+          shipping = 0;
+        } else if (subtotal >= 1000) {
+          shipping = 99;
+        }
+
+        return {
+          items: cartSummary.items,
+          subtotal,
+          shipping,
+          total: subtotal + shipping,
+          shippingDetails,
+          orderDate: new Date().toISOString(),
+        };
+      },
     }),
     {
       name: "shopping-cart",
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({
+        items: state.items,
+        shippingDetails: state.shippingDetails,
+      }),
     }
   )
 );

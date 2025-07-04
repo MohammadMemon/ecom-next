@@ -31,14 +31,11 @@ export default function CartPage() {
     getTotalPrice,
     getTotalItems,
     getCartSummary,
+    getOrderData,
   } = useCartStore();
 
   const [isClearing, setIsClearing] = useState(false);
   const summary = getCartSummary();
-
-  const shipping = 149;
-
-  const total = summary.totalPrice + shipping;
 
   const handleClearCart = async () => {
     setIsClearing(true);
@@ -241,18 +238,19 @@ export default function CartPage() {
 
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>₹{shipping}</span>
+                <span>₹{getOrderData().shipping.toFixed(2)}</span>
               </div>
 
               <div className="pt-3 border-t border-primary">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>₹{total.toFixed(2)}</span>
+                  <span>₹{getOrderData().total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
-
-            <Button className="w-full py-3 mt-6">Proceed to Checkout</Button>
+            <Link href="/checkout">
+              <Button className="w-full py-3 mt-6">Proceed to Checkout</Button>{" "}
+            </Link>
 
             <Link href="/products" className="block mt-4 text-center">
               Continue Shopping

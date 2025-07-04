@@ -10,28 +10,30 @@ const footerLinks = [
   {
     title: "Customer Support",
     links: [
-      { text: "Privacy Policy", href: "#" },
-      { text: "Terms & Conditions", href: "#" },
-      { text: "Shipping & Returns Policy", href: "#" },
-      { text: "FAQ", href: "#" },
+      { text: "Privacy Policy", href: "/privacy-policy" },
+      { text: "Terms & Conditions", href: "/terms-and-conditions" },
+      {
+        text: "Shipping & Returns Policy",
+        href: "/shipping-and-returns-policy",
+      },
+      { text: "FAQ", href: "/faq" },
     ],
   },
   {
     title: "Quick Links",
     links: [
-      { text: "Home", href: "#" },
-      { text: "All Products", href: "#" },
-      { text: "Orders", href: "#" },
-      { text: "Cart", href: "#" },
+      { text: "Home", href: "/" },
+      { text: "Products", href: "/products" },
+      { text: "Orders", href: "/account/orders" },
+      { text: "Cart", href: "/cart" },
     ],
   },
   {
     title: "Company",
     links: [
-      { text: "About Us", href: "#" },
-      { text: "Wishlist", href: "#" },
-      { text: "Contact Us", href: "#" },
-      { text: "Categories", href: "#" },
+      { text: "About Us", href: "/about-us" },
+      { text: "Contact Us", href: "/contact-us" },
+      { text: "Categories", href: "/categories" },
     ],
   },
 ];
@@ -77,9 +79,7 @@ export default function Footer() {
 
         <hr className="mb-8 border-gray-800" />
 
-        {/* Main footer content */}
         <div className="grid items-start grid-cols-1 gap-8 mx-auto mb-8 md:grid-cols-[2fr_1fr]">
-          {/* Footer Links - Centered on mobile */}
           <div className="grid grid-cols-1 gap-8 mx-auto sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 md:mx-0">
             {footerLinks.map((section) => (
               <div key={section.title} className="text-center sm:text-left">
@@ -137,7 +137,6 @@ export default function Footer() {
 
         <hr className="mb-6 border-gray-800" />
 
-        {/* Bottom section with question box */}
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-black">
             @Cycledaddy 2025, All rights reserved.

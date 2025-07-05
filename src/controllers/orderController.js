@@ -3,24 +3,36 @@ import Order from "@/models/orderModel";
 import Product from "@/models/productModel";
 
 // Create new Order
-export const newOrder = async (body, userId) => {
+export const newOrder = async (body) => {
   try {
-    // Validate userId
-    if (!userId) {
-      return { success: false, message: "User ID is required" };
+    // Validate required fields
+    if (!body.user && !body.guestUser) {
+      return {
+        success: false,
+        message: "Either user or guestUser is required",
+        statusCode: 400,
+      };
+    }
+
+    let userId;
+    if (body.user) {
+      userId = body.user;
+    } else if (body.guestUser) {
+      userId = `guest_${body.guestUser.email}`;
     }
 
     const order = await Order.create({
+      user: userId,
       itemsPrice: body.itemsPrice,
-      taxPrice: body.taxPrice,
       shippingPrice: body.shippingPrice,
       totalPrice: body.totalPrice,
       orderItems: body.orderItems,
       shippingInfo: body.shippingInfo,
       paymentInfo: body.paymentInfo,
-      paidAt: Date.now(),
-      user: userId,
+      orderStatus: body.orderStatus || "Processing",
+      paidAt: body.paymentInfo?.paidAt || Date.now(),
     });
+
     return {
       success: true,
       order,

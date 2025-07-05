@@ -2,14 +2,9 @@ import dbConnect from "@/lib/dbConnect";
 import { newOrder } from "@/controllers/orderController";
 import { NextResponse } from "next/server";
 
-//Auth needed
-
 export async function POST(req) {
   try {
     await dbConnect();
-
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.split("Bearer ")[1];
 
     let body;
     try {
@@ -21,16 +16,8 @@ export async function POST(req) {
         { status: 400 }
       );
     }
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: "No token provided" },
-        { status: 401 }
-      );
-    }
 
-    const userId = data.user.id;
-
-    const response = await newOrder(body, userId);
+    const response = await newOrder(body);
     if (response.success) {
       return NextResponse.json(response, { status: 201 });
     } else {

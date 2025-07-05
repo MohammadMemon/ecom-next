@@ -61,7 +61,7 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Shipping Details
-    name: shippingDetails?.name || user?.displayName || "",
+    name: shippingDetails?.name || "",
     email: shippingDetails?.email || "",
     phone: shippingDetails?.phone || "",
     address: shippingDetails?.address || "",
@@ -129,7 +129,9 @@ export default function CheckoutPage() {
     });
 
     try {
-      await initiatePayment(cartStore);
+      await initiatePayment(cartStore, {
+        user,
+      });
     } catch (error) {
       console.error("Payment error:", error);
     }

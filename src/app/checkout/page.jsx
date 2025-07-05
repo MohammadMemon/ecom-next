@@ -1,11 +1,14 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useCartStore from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMounted } from "@/hooks/useMounted";
+import { initiatePayment } from "@/utils/payment";
+import { googleProvider } from "@/firebase/client";
+import { getAuth } from "firebase/auth";
 
 export default function CheckoutPage() {
   const isMounted = useMounted();
@@ -20,11 +23,45 @@ export default function CheckoutPage() {
     clearCart,
   } = useCartStore();
 
+  const cartStore = useCartStore();
+
+  // Check User loggedin
+
+  const provider = googleProvider();
+  const auth = getAuth();
+  const [user, setUser] = useState(null);
+  console.log("User Details", user, user?.displayName);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const updatedName = shippingDetails?.name?.trim()
+      ? shippingDetails.name
+      : user?.displayName || "";
+
+    const updatedEmail = shippingDetails?.email?.trim()
+      ? shippingDetails.email
+      : user?.email || "";
+
+    setFormData((prev) => ({
+      ...prev,
+      name: updatedName,
+      email: updatedEmail,
+    }));
+  }, [user, shippingDetails?.name, shippingDetails?.email]);
+
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Shipping Details
-    firstName: shippingDetails?.firstName || "",
-    lastName: shippingDetails?.lastName || "",
+    name: shippingDetails?.name || user?.displayName || "",
     email: shippingDetails?.email || "",
     phone: shippingDetails?.phone || "",
     address: shippingDetails?.address || "",
@@ -46,8 +83,7 @@ export default function CheckoutPage() {
 
   const validateStep1 = () => {
     const required = [
-      "firstName",
-      "lastName",
+      "name",
       "email",
       "phone",
       "address",
@@ -62,8 +98,7 @@ export default function CheckoutPage() {
     if (validateStep1()) {
       // Save shipping details to store
       setShippingDetails({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        name: formData.name,
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
@@ -84,20 +119,20 @@ export default function CheckoutPage() {
 
   const handleStep2Next = () => {
     setCurrentStep(3);
+    handlePayment();
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     toast({
       title: "Processing Payment",
       description: "Redirecting to payment gateway...",
     });
-    // Here you would integrate with your payment processor
-    console.log("Payment data:", {
-      orderSummary: summary,
-      shippingDetails: formData,
-      paymentMethod: formData.paymentMethod,
-      total: total,
-    });
+
+    try {
+      await initiatePayment(cartStore);
+    } catch (error) {
+      console.error("Payment error:", error);
+    }
   };
 
   if (!isMounted) {
@@ -183,25 +218,12 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <label className="block mb-2 text-sm font-medium">
-                        First Name *
+                        Name *
                       </label>
                       <input
                         type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-2 text-sm font-medium">
-                        Last Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
+                        name="name"
+                        value={formData.name}
                         onChange={handleInputChange}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                         required
@@ -372,7 +394,7 @@ export default function CheckoutPage() {
                       Shipping Address
                     </h3>
                     <p className="text-gray-600">
-                      {formData.firstName} {formData.lastName}
+                      {formData.name}
                       <br />
                       {formData.address}
                       <br />
@@ -444,65 +466,6 @@ export default function CheckoutPage() {
                   <h2 className="mb-6 text-2xl font-semibold">
                     Payment Information
                   </h2>
-                  {formData.paymentMethod === "card" && (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block mb-2 text-sm font-medium">
-                          Name on Card
-                        </label>
-                        <input
-                          type="text"
-                          name="nameOnCard"
-                          value={formData.nameOnCard}
-                          onChange={handleInputChange}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                          placeholder="John Doe"
-                        />
-                      </div>
-                      <div>
-                        <label className="block mb-2 text-sm font-medium">
-                          Card Number
-                        </label>
-                        <input
-                          type="text"
-                          name="cardNumber"
-                          value={formData.cardNumber}
-                          onChange={handleInputChange}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                          placeholder="1234 5678 9012 3456"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block mb-2 text-sm font-medium">
-                            Expiry Date
-                          </label>
-                          <input
-                            type="text"
-                            name="expiryDate"
-                            value={formData.expiryDate}
-                            onChange={handleInputChange}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            placeholder="MM/YY"
-                          />
-                        </div>
-                        <div>
-                          <label className="block mb-2 text-sm font-medium">
-                            CVV
-                          </label>
-                          <input
-                            type="text"
-                            name="cvv"
-                            value={formData.cvv}
-                            onChange={handleInputChange}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            placeholder="123"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   <div className="flex justify-between mt-6">
                     <Button variant="outline" onClick={() => setCurrentStep(2)}>
                       Back to Review

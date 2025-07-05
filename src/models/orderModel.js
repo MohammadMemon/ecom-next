@@ -10,22 +10,20 @@ const orderSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-
     state: {
       type: String,
       required: true,
     },
-
     country: {
       type: String,
       required: true,
       default: "India",
     },
-    pinCode: {
+    pincode: {
       type: Number,
       required: true,
     },
-    phoneNo: {
+    phone: {
       type: Number,
       required: true,
     },
@@ -64,8 +62,25 @@ const orderSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    orderId: {
+      type: String,
+      required: true,
+    },
+    signature: {
+      type: String,
+      required: true,
+    },
     status: {
       type: String,
+      required: true,
+    },
+    method: {
+      type: String,
+      required: true,
+      default: "razorpay",
+    },
+    paidAt: {
+      type: Date,
       required: true,
     },
   },
@@ -92,6 +107,7 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
     default: "Processing",
+    enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
   },
   deliveredAt: Date,
   createdAt: {
@@ -100,11 +116,19 @@ const orderSchema = new mongoose.Schema({
   },
 });
 
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ "paymentInfo.id": 1 });
+
+orderSchema.methods.isGuestOrder = function () {
+  return this.user.startsWith("guest_");
+};
+
 let Order;
 
 if (mongoose.models.Order) {
-  Order = mongoose.models.Order; // Use the existing model if it's already registered
+  Order = mongoose.models.Order;
 } else {
-  Order = mongoose.model("Order", orderSchema, "orders"); // Otherwise, create a new model
+  Order = mongoose.model("Order", orderSchema, "orders");
 }
+
 export default Order;

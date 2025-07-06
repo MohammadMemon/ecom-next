@@ -9,6 +9,7 @@ import { useMounted } from "@/hooks/useMounted";
 import { initiatePayment } from "@/utils/payment";
 import { googleProvider } from "@/firebase/client";
 import { getAuth } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
   const isMounted = useMounted();
@@ -24,6 +25,8 @@ export default function CheckoutPage() {
   } = useCartStore();
 
   const cartStore = useCartStore();
+
+  const router = useRouter();
 
   // Check User loggedin
 
@@ -129,7 +132,7 @@ export default function CheckoutPage() {
     });
 
     try {
-      await initiatePayment(cartStore, {
+      await initiatePayment(cartStore, router, {
         user,
       });
     } catch (error) {

@@ -46,7 +46,7 @@ const calculateOrderTotals = (cartStore) => {
 };
 
 // Main payment function
-export const initiatePayment = async (cartStore, options = {}) => {
+export const initiatePayment = async (cartStore, router, options = {}) => {
   const shippingDetails = cartStore.getShippingDetails();
 
   const user = options.user || null;
@@ -120,12 +120,17 @@ export const initiatePayment = async (cartStore, options = {}) => {
         order_id: orderData.data.id,
         handler: async (response) => {
           try {
-            const result = await handlePaymentSuccess(response, buyer, {
-              items: orderTotals.items,
-              shippingDetails,
-              orderTotals,
-              cartStore,
-            });
+            const result = await handlePaymentSuccess(
+              response,
+              buyer,
+              {
+                items: orderTotals.items,
+                shippingDetails,
+                orderTotals,
+                cartStore,
+              },
+              router
+            );
             resolve(result);
           } catch (error) {
             reject(error);
@@ -163,9 +168,13 @@ export const initiatePayment = async (cartStore, options = {}) => {
 };
 
 // Handle payment success
-const handlePaymentSuccess = async (paymentResponse, buyer, orderData) => {
+const handlePaymentSuccess = async (
+  paymentResponse,
+  buyer,
+  orderData,
+  router
+) => {
   try {
-    console.log("buyer aaya", buyer);
     // Verify payment
     const verifyResponse = await fetch("/api/v1/payment/verify", {
       method: "POST",
@@ -236,6 +245,7 @@ const handlePaymentSuccess = async (paymentResponse, buyer, orderData) => {
       })
     );
 
+    router.replace("/order-confirmed");
     return {
       success: true,
       paymentId: paymentResponse.razorpay_payment_id,

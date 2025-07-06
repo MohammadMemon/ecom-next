@@ -6,19 +6,17 @@ import { Suspense } from "react";
 export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-6 min-h-svh bg-muted md:p-10">
-      <div className="flex flex-col w-full max-w-sm gap-6">
-        <a href="/" className="flex items-center self-center gap-2 font-medium">
-          <div className="flex items-center justify-center w-6 h-6 rounded-md text-primary-foreground">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              height={1200}
-              width={1200}
-              className="rounded-lg "
-              priority
-            ></Image>
-          </div>
-        </a>
+      <div className="flex flex-col w-full max-w-sm gap-1">
+        <div className="flex items-center justify-center">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={200}
+            height={200}
+            className="rounded-lg"
+            priority
+          />
+        </div>
         <Suspense fallback={<div>Loading...</div>}>
           <LoginForm />
         </Suspense>

@@ -68,24 +68,14 @@ const Navbar = () => {
           ],
         },
         {
-          name: "Shifting & Braking",
-          href: "/category/gears-and-chains/shifting-and-braking",
-          subSubCategories: [
-            {
-              name: "Shifters",
-              href: "/category/gears-and-chains/shifting-and-braking/shifters",
-            },
-            {
-              name: "Brake Levers",
-              href: "/category/gears-and-chains/shifting-and-braking/brake-levers",
-            },
-          ],
+          name: "Shifters",
+          href: "/category/gears-and-chains/shifters",
         },
         {
           name: "Pedals & Cleats",
           href: "/category/gears-and-chains/pedals-and-cleats",
         },
-        { name: "B.B. Sets", href: "/category/gears-and-chains/bb-sets" },
+        { name: "B.B. Sets", href: "/category/gears-and-chains/b.b.-sets" },
       ],
     },
     {
@@ -339,7 +329,7 @@ const Navbar = () => {
           subSubCategories: [
             {
               name: "Indoor Trainers",
-              href: "/category/category/add-ons/performance-equipment/indoor-trainers",
+              href: "/category/add-ons/performance-equipment/indoor-trainers",
             },
             {
               name: "Speedometers",

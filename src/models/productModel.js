@@ -1,27 +1,14 @@
-import mongoose, { Schema } from "mongoose";
+const mongoose = require("mongoose");
 
-const productSchema = new Schema({
+const productSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Please Enter Product Name"],
+    required: true,
     trim: true,
   },
-  description: {
-    type: String,
-    required: [true, "Please Enter Product Description"],
-  },
-  oldPrice: {
+  stock: {
     type: Number,
-    required: [true, "Please Enter Real Product Price"],
-    maxLength: [6, " Price cannot exceed 6 characters "],
-  },
-  price: {
-    type: Number,
-    required: [true, "Please Enter Discounted Product Price"],
-    maxLength: [6, " Price cannot exceed 6 characters "],
-  },
-  ratings: {
-    type: Number,
+    required: true,
     default: 0,
   },
   images: [
@@ -36,25 +23,53 @@ const productSchema = new Schema({
       },
     },
   ],
+  price: {
+    type: Number,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
   category: {
     type: String,
-    required: [true, "Please Enter Product Category"],
+    required: true,
+    trim: true,
   },
   subCategory: {
     type: String,
+    trim: true,
   },
-  subSubCategory: {
+  description: {
     type: String,
+    required: true,
   },
-  tags: {
-    type: String,
-    required: [true, "Please Enter Product Meta Tags, Max 8."],
+  specifications: {
+    type: Map,
+    of: String,
+    default: {},
   },
-  stock: {
+  variants: [
+    {
+      options: [
+        {
+          size: { type: String, required: true }, // e.g., Small, Medium
+          color: { type: String, required: true }, // e.g., Blue, Red
+          stock: { type: Number, default: 0 }, // Stock for this combination
+          price: { type: Number, required: true }, // Price for this combination
+          images: [
+            {
+              public_id: { type: String },
+              url: { type: String },
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  averageRating: {
     type: Number,
-    required: [true, "Please Enter Product Stock"],
-    maxLength: [3, "Stock cannot exceed 4 characters"],
-    default: 1,
+    default: 0,
   },
   numOfReviews: {
     type: Number,
@@ -81,140 +96,35 @@ const productSchema = new Schema({
       },
     },
   ],
-  user: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-    required: false,
+  ratings: {
+    type: Number,
+    default: 0,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  status: {
+    type: String,
+    enum: ["active", "inactive", "out-of-stock", "discontinued"],
+    default: "active",
+  },
+  tags: {
+    type: [String],
+    default: [],
+  },
+  brand: {
+    type: String,
+    trim: true,
+  },
+  scrapeInfo: {
+    scrapedAt: String,
+    scrapedUrl: String,
   },
 });
 
 let Product;
 
 if (mongoose.models.Product) {
-  Product = mongoose.models.Product; // Use the existing model if it's already registered
+  Product = mongoose.models.Product;
 } else {
-  Product = mongoose.model("Product", productSchema, "products"); // Otherwise, create a new model
+  Product = mongoose.model("Product", productSchema, "products");
 }
 
 export default Product;
-
-// const mongoose = require('mongoose');
-
-// const productSchema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: true,
-//     trim: true,
-//   },
-//   stock: {
-//     type: Number,
-//     required: true,
-//     default: 0,
-//   },
-//   images: {
-//     type: [String],  // Array of image URLs
-//     required: true,
-//   },
-//   price: {
-//     type: Number,
-//     required: true,
-//   },
-//   createdAt: {
-//     type: Date,
-//     default: Date.now,
-//   },
-//   category: {
-//     type: String,
-//     required: true,
-//     trim: true,
-//   },
-//   subCategory: {
-//     type: String,
-//     trim: true,  // Optional, can be empty
-//   },
-//   description: {
-//     type: String,
-//     required: true,
-//   },
-//   specifications: {
-//     type: Map,
-//     of: String,
-//     default: {},
-//   },
-//  variants: [
-//   {
-//     options: [
-//       {
-//         size: { type: String, required: true }, // e.g., Small, Medium
-//         color: { type: String, required: true }, // e.g., Blue, Red
-//         stock: { type: Number, default: 0 }, // Stock for this combination
-//         price: { type: Number, required: true }, // Price for this combination
-//         images: [
-//           {
-//             public_id: { type: String },
-//             url: { type: String },
-//           },
-//         ], // Specific images for this variant (optional)
-//       },
-//     ],
-//   },
-// ],
-//   averageRating: {
-//     type: Number,
-//     default: 0,
-//   },
-//   numOfReviews: {
-//     type: Number,
-//     default: 0,
-//   },
-//   reviews: [
-//     {
-//       user: {
-//         type: mongoose.Schema.ObjectId,
-//         ref: 'User',
-//         required: true,
-//       },
-//       name: {
-//         type: String,
-//         required: true,
-//       },
-//       rating: {
-//         type: Number,
-//         required: true,
-//       },
-//       comment: {
-//         type: String,
-//         required: true,
-//       },
-//     },
-//   ],
-//   ratings: {
-//     type: Number,
-//     default: 0,
-//   },
-//   status: {
-//     type: String,
-//     enum: ['active', 'inactive', 'out-of-stock', 'discontinued'],
-//     default: 'active',
-//   },
-//   tags: {
-//     type: [String],
-//     default: [],
-//   },
-//   brand: {
-//     type: String,
-//     trim: true,
-//   },
-//   scrapeInfo: {
-//     type: String,  // URL or identifier for scraping
-//     required: true,
-//   },
-// });
-
-// const Product = mongoose.model('Product', productSchema);
-
-// module.exports = Product;

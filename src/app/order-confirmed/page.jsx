@@ -258,7 +258,7 @@ export default function OrderConfirmed() {
                 href="mailto:info@cycledaddy.com"
                 className="font-semibold text-green-600 transition-colors duration-200 hover:text-primary-700"
               >
-                support@cycledaddy.com
+                info@cycledaddy.com
               </a>
             </div>
           </div>

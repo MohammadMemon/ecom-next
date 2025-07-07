@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useCartStore from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import { useMounted } from "@/hooks/useMounted";
 
 export default function CartPage() {
   const isMounted = useMounted();
+  const { toast } = useToast();
 
   const {
     items,
@@ -32,19 +33,85 @@ export default function CartPage() {
     getTotalItems,
     getCartSummary,
     getOrderData,
+    validateCartStock,
+    getStockValidationResult,
+    clearStockValidationResult,
   } = useCartStore();
 
   const [isClearing, setIsClearing] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [hasValidated, setHasValidated] = useState(false);
   const summary = getCartSummary();
+
+  // Stock validation on page load
+  useEffect(() => {
+    if (isMounted && items.length > 0 && !hasValidated) {
+      const checkStock = async () => {
+        setIsValidating(true);
+        try {
+          const result = await validateCartStock();
+
+          if (result.hasChanges && result.issues.length > 0) {
+            // Show toast notifications for each issue
+            result.issues.forEach((issue, index) => {
+              setTimeout(() => {
+                toast({
+                  title: "Cart Updated",
+                  description: issue.message,
+                  variant: issue.type === "error" ? "destructive" : "default",
+                });
+              }, index * 500); // Stagger toast notifications
+            });
+          }
+
+          setHasValidated(true);
+        } catch (error) {
+          toast({
+            title: "Stock Check Failed",
+            description:
+              "Unable to verify product availability. Please refresh the page.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsValidating(false);
+        }
+      };
+
+      checkStock();
+    }
+  }, [isMounted, items.length, hasValidated, validateCartStock, toast]);
 
   const handleClearCart = async () => {
     setIsClearing(true);
     setTimeout(() => {
       clearCart();
       setIsClearing(false);
+      toast({
+        title: "Cart Cleared",
+        description: "All items have been removed from your cart.",
+      });
     }, 500);
   };
-  const { toast } = useToast();
+
+  const handleRemoveItem = (item) => {
+    removeItem(item._id);
+    toast({
+      title: "Removed from Cart",
+      description: `${item.name} was removed from your cart.`,
+    });
+  };
+
+  const handleQuantityChange = (item, newQuantity) => {
+    if (newQuantity > item.stock) {
+      toast({
+        title: "Stock Limit Reached",
+        description: `Only ${item.stock} units of ${item.name} are available.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    updateQuantity(item._id, newQuantity);
+  };
 
   if (!isMounted) {
     return (
@@ -54,6 +121,17 @@ export default function CartPage() {
             <div className="w-48 h-8 mx-auto mb-4 bg-gray-200 rounded"></div>
             <div className="w-64 h-4 mx-auto bg-gray-200 rounded"></div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isValidating) {
+    return (
+      <div className="container px-4 py-8 mx-auto">
+        <div className="py-16 text-center">
+          <div className="w-12 h-12 mx-auto mb-4 border-b-2 border-blue-600 rounded-full animate-spin"></div>
+          <p className="text-gray-600">Checking product availability...</p>
         </div>
       </div>
     );
@@ -127,32 +205,34 @@ export default function CartPage() {
                     className="flex flex-col p-4 border rounded-lg border-primary sm:flex-row sm:items-center sm:gap-4"
                   >
                     {/* First Row (Image + Name) - Expands */}
-                    <div className="flex items-center flex-1 gap-4 ">
-                      {/* Product Image */}
-                      <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-md">
-                        {item.images ? (
-                          <Image
-                            src={item.images[0].url}
-                            alt={item.name}
-                            width={80}
-                            height={80}
-                            className="object-cover w-full h-full rounded-md"
-                          />
-                        ) : (
-                          <div className="flex items-center justify-center w-full h-full text-gray-400">
-                            📦
-                          </div>
-                        )}
-                      </div>
+                    <Link href={`/product/${item._id}`}>
+                      <div className="flex items-center flex-1 gap-4">
+                        {/* Product Image */}
+                        <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-md">
+                          {item.images ? (
+                            <Image
+                              src={item.images[0].url}
+                              alt={item.name}
+                              width={80}
+                              height={80}
+                              className="object-cover w-full h-full rounded-md"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-full text-gray-400">
+                              📦
+                            </div>
+                          )}
+                        </div>
 
-                      {/* Product Name and Price */}
-                      <div>
-                        <h3 className="text-lg font-semibold">{item.name}</h3>
-                        <p className="text-gray-600">
-                          ₹{item.price.toFixed(2)} each
-                        </p>
+                        {/* Product Name and Price */}
+                        <div>
+                          <h3 className="text-lg font-semibold">{item.name}</h3>
+                          <p className="text-gray-600">
+                            ₹{item.price.toFixed(2)} each
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
 
                     {/* Second Row (Quantity + Total + Remove) - Fixed Width */}
                     <div className="flex items-center justify-between w-full gap-6 mt-4 sm:mt-0 sm:justify-end sm:w-auto">
@@ -161,6 +241,7 @@ export default function CartPage() {
                         <button
                           onClick={() => decrementQuantity(item._id)}
                           className="px-3 py-2 text-gray-600 hover:text-gray-800"
+                          disabled={item.quantity <= 1}
                         >
                           -
                         </button>
@@ -169,7 +250,8 @@ export default function CartPage() {
                         </span>
                         <button
                           onClick={() => incrementQuantity(item._id)}
-                          className="px-3 py-2 text-gray-600 hover:text-gray-800"
+                          className="px-3 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                          disabled={item.stock && item.quantity >= item.stock}
                         >
                           +
                         </button>
@@ -202,13 +284,7 @@ export default function CartPage() {
                                 Cancel
                               </AlertDialogCancel>
                               <AlertDialogAction
-                                onClick={() => {
-                                  removeItem(item._id);
-                                  toast({
-                                    title: "Removed from Cart",
-                                    description: `${item.name} was removed.`,
-                                  });
-                                }}
+                                onClick={() => handleRemoveItem(item)}
                                 className="text-white bg-red-600 hover:bg-red-700"
                               >
                                 Remove
@@ -249,7 +325,7 @@ export default function CartPage() {
               </div>
             </div>
             <Link href="/checkout">
-              <Button className="w-full py-3 mt-6">Proceed to Checkout</Button>{" "}
+              <Button className="w-full py-3 mt-6">Proceed to Checkout</Button>
             </Link>
 
             <Link href="/products" className="block mt-4 text-center">

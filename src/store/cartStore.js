@@ -7,6 +7,7 @@ const useCartStore = create(
       // STATE
       items: [],
       shippingDetails: null,
+      stockValidationResult: null, // Store validation results
 
       // ACTIONS
       addItem: (product) => {
@@ -91,7 +92,127 @@ const useCartStore = create(
         });
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], stockValidationResult: null }),
+
+      // STOCK VALIDATION METHODS
+      validateCartStock: async () => {
+        const { items } = get();
+
+        if (items.length === 0) {
+          set({ stockValidationResult: { isValid: true, issues: [] } });
+          return { isValid: true, issues: [] };
+        }
+
+        try {
+          // Get current stock for all products in cart
+          const productIds = items.map((item) => item._id);
+          const response = await fetch("/api/v1/products/stock", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productIds }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch stock data");
+          }
+
+          const stockData = await response.json();
+
+          const issues = [];
+          const updatedItems = [];
+
+          items.forEach((item) => {
+            const currentStock = stockData.find(
+              (stock) => stock._id === item._id
+            );
+
+            if (!currentStock) {
+              // Product no longer exists
+              issues.push({
+                type: "removed",
+                productId: item._id,
+                productName: item.name,
+                message: `${item.name} is no longer available and has been removed from your cart.`,
+              });
+              return; // Don't add to updatedItems
+            }
+
+            if (currentStock.stock === 0) {
+              // Product out of stock
+              issues.push({
+                type: "out_of_stock",
+                productId: item._id,
+                productName: item.name,
+                message: `${item.name} is out of stock and has been removed from your cart.`,
+              });
+              return; // Don't add to updatedItems
+            }
+
+            if (item.quantity > currentStock.stock) {
+              // Quantity reduced
+              issues.push({
+                type: "quantity_reduced",
+                productId: item._id,
+                productName: item.name,
+                oldQuantity: item.quantity,
+                newQuantity: currentStock.stock,
+                message: `${item.name} quantity reduced from ${item.quantity} to ${currentStock.stock} due to limited stock.`,
+              });
+
+              updatedItems.push({
+                ...item,
+                quantity: currentStock.stock,
+                stock: currentStock.stock, // Update stock info
+              });
+            } else {
+              // No issues, just update stock info
+              updatedItems.push({
+                ...item,
+                stock: currentStock.stock,
+              });
+            }
+          });
+
+          const validationResult = {
+            isValid: issues.length === 0,
+            issues,
+            hasChanges: issues.length > 0,
+          };
+
+          // Update cart with validated items and store validation result
+          set({
+            items: updatedItems,
+            stockValidationResult: validationResult,
+          });
+
+          return validationResult;
+        } catch (error) {
+          console.error("Stock validation failed:", error);
+          const errorResult = {
+            isValid: false,
+            issues: [
+              {
+                type: "error",
+                message:
+                  "Unable to validate stock. Please refresh and try again.",
+              },
+            ],
+            hasChanges: false,
+          };
+
+          set({ stockValidationResult: errorResult });
+          return errorResult;
+        }
+      },
+
+      // Get validation results without triggering new validation
+      getStockValidationResult: () => {
+        return get().stockValidationResult;
+      },
+
+      clearStockValidationResult: () => {
+        set({ stockValidationResult: null });
+      },
 
       // GETTERS (Computed values)
       getTotalItems: () => {
@@ -152,11 +273,11 @@ const useCartStore = create(
         set({ shippingDetails: null });
       },
 
-      // Complete order method (clears cart and shipping details)
       completeOrder: () => {
         set({
           items: [],
           shippingDetails: null,
+          stockValidationResult: null,
         });
       },
 

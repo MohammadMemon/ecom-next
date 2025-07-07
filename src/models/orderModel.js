@@ -1,6 +1,36 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
+  orderId: {
+    type: String,
+    required: true,
+  },
+  itemsPrice: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  shippingPrice: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  totalPrice: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  orderStatus: {
+    type: String,
+    required: true,
+    default: "Processing",
+    enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
+  },
+  user: {
+    userId: { type: String, required: true },
+    userEmail: { type: String, required: true },
+    isGuest: { type: Boolean, required: true },
+  },
   shippingInfo: {
     address: {
       type: String,
@@ -53,22 +83,18 @@ const orderSchema = new mongoose.Schema({
       },
       categorySlug: {
         type: String,
-        required: true,
+        required: false,
       },
       subCategorySlug: {
         type: String,
-        required: true,
+        required: false,
       },
       subSubCategorySlug: {
         type: String,
-        required: true,
+        required: false,
       },
     },
   ],
-  user: {
-    type: String,
-    required: true,
-  },
   paymentInfo: {
     id: {
       type: String,
@@ -95,31 +121,6 @@ const orderSchema = new mongoose.Schema({
       type: Date,
       required: true,
     },
-  },
-  paidAt: {
-    type: Date,
-    required: true,
-  },
-  itemsPrice: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  shippingPrice: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  totalPrice: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  orderStatus: {
-    type: String,
-    required: true,
-    default: "Processing",
-    enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
   },
   deliveredAt: Date,
   createdAt: {

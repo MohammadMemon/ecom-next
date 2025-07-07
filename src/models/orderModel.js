@@ -51,6 +51,18 @@ const orderSchema = new mongoose.Schema({
         ref: "Product",
         required: true,
       },
+      categorySlug: {
+        type: String,
+        required: true,
+      },
+      subCategorySlug: {
+        type: String,
+        required: true,
+      },
+      subSubCategorySlug: {
+        type: String,
+        required: true,
+      },
     },
   ],
   user: {

@@ -129,20 +129,18 @@ export const initiatePayment = async (cartStore, router, options = {}) => {
                 orderTotals,
                 cartStore,
               },
-              router
+              router,
+              options
             );
             resolve(result);
           } catch (error) {
             reject(error);
           }
         },
-
         prefill: {
-          prefill: {
-            name: buyer.name,
-            email: buyer.email,
-            contact: buyer.phone,
-          },
+          name: buyer.name,
+          email: buyer.email,
+          contact: buyer.phone,
         },
         notes: {
           address: `${shippingDetails.address}, ${shippingDetails.city}`,
@@ -172,33 +170,30 @@ const handlePaymentSuccess = async (
   paymentResponse,
   buyer,
   orderData,
-  router
+  router,
+  options = {}
 ) => {
   try {
-    // Verify payment
-    const verifyResponse = await fetch("/api/v1/payment/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(paymentResponse),
-    });
-
-    const verifyData = await verifyResponse.json();
-
-    if (!verifyData.success) {
-      throw new Error(verifyData.message || "Payment verification failed");
-    }
-
+    // Prepare order items for backend
     const orderItems = orderData.items.map((item) => ({
       name: item.name,
       price: item.price,
       quantity: item.quantity,
       image: item.images[0]?.url || "",
       product: item._id,
+      categorySlug: item.categorySlug,
+      subCategorySlug: item.subCategorySlug,
+      subSubCategorySlug: item.subSubCategorySlug,
     }));
 
-    // Prepare order data
+    // Prepare complete order payload for secure backend endpoint
     const orderPayload = {
-      orderId: paymentResponse.razorpay_payment_id,
+      // Payment verification data
+      razorpay_order_id: paymentResponse.razorpay_order_id,
+      razorpay_payment_id: paymentResponse.razorpay_payment_id,
+      razorpay_signature: paymentResponse.razorpay_signature,
+
+      // Order data
       user: buyer.isGuest ? null : buyer.id,
       guestUser: buyer.isGuest ? buyer : null,
       shippingInfo: orderData.shippingDetails,
@@ -206,50 +201,40 @@ const handlePaymentSuccess = async (
       itemsPrice: orderData.orderTotals.subtotal,
       shippingPrice: orderData.orderTotals.shippingCharges,
       totalPrice: orderData.orderTotals.totalPrice,
-      paymentInfo: {
-        id: paymentResponse.razorpay_payment_id,
-        orderId: paymentResponse.razorpay_order_id,
-        signature: paymentResponse.razorpay_signature,
-        status: "succeeded",
-        method: "razorpay",
-        paidAt: new Date().toISOString(),
-      },
-      orderStatus: "Processing",
-      createdAt: new Date().toISOString(),
+      businessName: options.businessName || "Cycledaddy",
     };
 
-    // Save order to database
-    const orderSaveResponse = await fetch("/api/v1/order/new", {
+    // Send to secure backend endpoint that handles everything atomically
+    const secureResponse = await fetch("/api/v1/order/handler", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderPayload),
     });
 
-    const orderSaveData = await orderSaveResponse.json();
+    const secureData = await secureResponse.json();
 
-    if (!orderSaveData.success) {
-      throw new Error("Order could not be saved");
+    if (!secureData.success) {
+      throw new Error(secureData.message || "Order processing failed");
     }
 
-    // Clear cart after successful payment
     orderData.cartStore.completeOrder();
 
-    // Store payment info in localStorage for success page
-    localStorage.setItem(
-      "lastPayment",
-      JSON.stringify({
-        paymentId: paymentResponse.razorpay_payment_id,
-        orderId: paymentResponse.razorpay_order_id,
-        amount: orderData.orderTotals.totalPrice,
-        timestamp: new Date().toISOString(),
-      })
-    );
+    const paymentInfo = {
+      paymentId: paymentResponse.razorpay_payment_id,
+      orderId: secureData.data.orderId,
+      amount: orderData.orderTotals.totalPrice,
+      timestamp: new Date().toISOString(),
+    };
 
+    sessionStorage.setItem("lastPayment", JSON.stringify(paymentInfo));
+
+    // Navigate to success page
     router.replace("/order-confirmed");
+
     return {
       success: true,
       paymentId: paymentResponse.razorpay_payment_id,
-      orderId: paymentResponse.razorpay_order_id,
+      orderId: secureData.data.orderId,
       amount: orderData.orderTotals.totalPrice,
     };
   } catch (error) {

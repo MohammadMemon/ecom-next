@@ -6,31 +6,42 @@ import Product from "@/models/productModel";
 export const newOrder = async (body) => {
   try {
     // Validate required fields
-    if (!body.user && !body.guestUser) {
+    if (
+      !body.user ||
+      !body.user.userId ||
+      !body.user.userEmail ||
+      typeof body.user.isGuest !== "boolean"
+    ) {
       return {
         success: false,
-        message: "Either user or guestUser is required",
+        message: "Incomplete or invalid user information",
         statusCode: 400,
       };
     }
 
-    let userId;
-    if (body.user) {
-      userId = body.user;
-    } else if (body.guestUser) {
-      userId = `guest_${body.guestUser.email}`;
-    }
-
+    // Create the order
     const order = await Order.create({
-      user: userId,
+      orderId: body.orderId,
+      user: {
+        userId: body.user.userId,
+        userEmail: body.user.userEmail,
+        isGuest: body.user.isGuest,
+      },
+      shippingInfo: body.shippingInfo,
+      orderItems: body.orderItems,
       itemsPrice: body.itemsPrice,
       shippingPrice: body.shippingPrice,
       totalPrice: body.totalPrice,
-      orderItems: body.orderItems,
-      shippingInfo: body.shippingInfo,
-      paymentInfo: body.paymentInfo,
+      paymentInfo: {
+        id: body.paymentInfo.id,
+        orderId: body.paymentInfo.orderId,
+        signature: body.paymentInfo.signature,
+        status: body.paymentInfo.status,
+        method: body.paymentInfo.method,
+        paidAt: body.paymentInfo.paidAt || new Date().toISOString(),
+      },
       orderStatus: body.orderStatus || "Processing",
-      paidAt: body.paymentInfo?.paidAt || Date.now(),
+      createdAt: new Date(body.createdAt).toISOString(),
     });
 
     return {

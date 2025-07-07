@@ -53,11 +53,12 @@ export const initiatePayment = async (cartStore, router, options = {}) => {
 
   // Determine user identity
   let buyer = null;
+  let userField = null;
 
   if (user) {
     buyer = {
-      id: user.email,
-      name: shippingDetails.name?.trim() || user.displayName,
+      id: user.uid,
+      name: user.displayName,
       email: user.email,
       phone: shippingDetails.phone,
       isGuest: false,
@@ -71,6 +72,12 @@ export const initiatePayment = async (cartStore, router, options = {}) => {
       isGuest: true,
     };
   }
+
+  userField = {
+    userId: buyer.id,
+    userEmail: buyer.email,
+    isGuest: buyer.isGuest,
+  };
 
   try {
     const cartSummary = cartStore.getCartSummary();
@@ -122,7 +129,7 @@ export const initiatePayment = async (cartStore, router, options = {}) => {
           try {
             const result = await handlePaymentSuccess(
               response,
-              buyer,
+              userField,
               {
                 items: orderTotals.items,
                 shippingDetails,
@@ -138,9 +145,9 @@ export const initiatePayment = async (cartStore, router, options = {}) => {
           }
         },
         prefill: {
-          name: buyer.name,
-          email: buyer.email,
-          contact: buyer.phone,
+          name: userField.name,
+          email: userField.email,
+          contact: userField.phone,
         },
         notes: {
           address: `${shippingDetails.address}, ${shippingDetails.city}`,
@@ -168,13 +175,12 @@ export const initiatePayment = async (cartStore, router, options = {}) => {
 // Handle payment success
 const handlePaymentSuccess = async (
   paymentResponse,
-  buyer,
+  userField,
   orderData,
   router,
   options = {}
 ) => {
   try {
-    // Prepare order items for backend
     const orderItems = orderData.items.map((item) => ({
       name: item.name,
       price: item.price,
@@ -183,19 +189,15 @@ const handlePaymentSuccess = async (
       product: item._id,
       categorySlug: item.categorySlug,
       subCategorySlug: item.subCategorySlug,
-      subSubCategorySlug: item.subSubCategorySlug,
+      ...(item.subSubCategorySlug && {
+        subSubCategorySlug: item.subSubCategorySlug,
+      }),
     }));
-
-    // Prepare complete order payload for secure backend endpoint
     const orderPayload = {
-      // Payment verification data
       razorpay_order_id: paymentResponse.razorpay_order_id,
       razorpay_payment_id: paymentResponse.razorpay_payment_id,
       razorpay_signature: paymentResponse.razorpay_signature,
-
-      // Order data
-      user: buyer.isGuest ? null : buyer.id,
-      guestUser: buyer.isGuest ? buyer : null,
+      user: userField,
       shippingInfo: orderData.shippingDetails,
       orderItems: orderItems,
       itemsPrice: orderData.orderTotals.subtotal,
@@ -204,7 +206,6 @@ const handlePaymentSuccess = async (
       businessName: options.businessName || "Cycledaddy",
     };
 
-    // Send to secure backend endpoint that handles everything atomically
     const secureResponse = await fetch("/api/v1/order/handler", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -217,8 +218,6 @@ const handlePaymentSuccess = async (
       throw new Error(secureData.message || "Order processing failed");
     }
 
-    orderData.cartStore.completeOrder();
-
     const paymentInfo = {
       paymentId: paymentResponse.razorpay_payment_id,
       orderId: secureData.data.orderId,
@@ -228,8 +227,9 @@ const handlePaymentSuccess = async (
 
     sessionStorage.setItem("lastPayment", JSON.stringify(paymentInfo));
 
-    // Navigate to success page
-    router.replace("/order-confirmed");
+    await router.replace("/order-confirmed");
+
+    orderData.cartStore.completeOrder();
 
     return {
       success: true,

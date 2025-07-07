@@ -83,11 +83,11 @@ const orderSchema = new mongoose.Schema({
       },
       categorySlug: {
         type: String,
-        required: false,
+        required: true,
       },
       subCategorySlug: {
         type: String,
-        required: false,
+        required: true,
       },
       subSubCategorySlug: {
         type: String,

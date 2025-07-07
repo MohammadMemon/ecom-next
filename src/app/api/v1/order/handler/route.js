@@ -4,6 +4,7 @@ import { updateProductStock } from "@/controllers/productController"; // Assumin
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { generateOrderId } from "@/utils/generateOrderId";
 
 // WhatsApp/Email notification functions (implement as needed)
 const sendNotifications = async (orderData) => {
@@ -43,7 +44,6 @@ export async function POST(request) {
       razorpay_signature,
       // Order data
       user,
-      guestUser,
       shippingInfo,
       orderItems,
       itemsPrice,
@@ -88,10 +88,11 @@ export async function POST(request) {
       );
     }
 
+    const orderId = await generateOrderId();
+
     const orderPayload = {
-      orderId: razorpay_payment_id,
-      user: user || null,
-      guestUser: guestUser || null,
+      orderId: orderId,
+      user: user,
       shippingInfo,
       orderItems: orderItems,
       itemsPrice,
@@ -175,7 +176,7 @@ export async function POST(request) {
         success: true,
         message: "Order created successfully",
         data: {
-          orderId: createdOrder._id,
+          orderId: orderId,
           paymentId: razorpay_payment_id,
           amount: totalPrice,
           status: "confirmed",

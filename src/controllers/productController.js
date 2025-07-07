@@ -195,6 +195,71 @@ export const updateProduct = async (id, body) => {
   }
 };
 
+// Update product stock after order
+export const updateProductStock = async (productId, quantity) => {
+  try {
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      throw new Error(`Product with ID ${productId} not found`);
+    }
+
+    if (product.stock < quantity) {
+      throw new Error(
+        `Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${quantity}`
+      );
+    }
+
+    // Update stock
+    product.stock -= quantity;
+
+    // Update availability status if out of stock
+    if (product.stock === 0) {
+      product.status = "out-of-stock";
+    }
+
+    await product.save();
+
+    console.log(
+      `Stock updated for product ${product.name}: ${product.stock} remaining`
+    );
+
+    return {
+      success: true,
+      productId,
+      newStock: product.stock,
+      productName: product.name,
+    };
+  } catch (error) {
+    console.error(`Stock update error for product ${productId}:`, error);
+    throw error;
+  }
+};
+
+// Bulk stock update (for multiple products)
+export const bulkUpdateProductStock = async (orderItems) => {
+  const results = [];
+  const errors = [];
+
+  for (const item of orderItems) {
+    try {
+      const result = await updateProductStock(item.product, item.quantity);
+      results.push(result);
+    } catch (error) {
+      errors.push({
+        productId: item.product,
+        error: error.message,
+      });
+    }
+  }
+
+  return {
+    success: errors.length === 0,
+    results,
+    errors,
+  };
+};
+
 // Delete Product
 
 export const deleteProduct = async (id) => {

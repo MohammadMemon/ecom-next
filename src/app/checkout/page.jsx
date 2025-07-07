@@ -33,7 +33,6 @@ export default function CheckoutPage() {
   const provider = googleProvider();
   const auth = getAuth();
   const [user, setUser] = useState(null);
-  console.log("User Details", user, user?.displayName);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -132,11 +131,36 @@ export default function CheckoutPage() {
     });
 
     try {
-      await initiatePayment(cartStore, router, {
-        user,
-      });
+      await initiatePayment(cartStore, router, { user });
     } catch (error) {
-      console.error("Payment error:", error);
+      if (
+        error instanceof Error &&
+        error.message === "Payment cancelled by user"
+      ) {
+        toast({
+          title: "Payment Cancelled",
+          description: "Your payment was not completed.",
+          variant: "destructive",
+          action: (
+            <Button
+              className="text-black bg-white shadow-lg hover:text-white"
+              size="sm"
+              onClick={() => {
+                handlePayment();
+              }}
+            >
+              Try Again
+            </Button>
+          ),
+        });
+      } else {
+        toast({
+          title: "Payment Failed",
+          description:
+            error.message || "Unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 

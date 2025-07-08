@@ -40,7 +40,7 @@ export const newOrder = async (body) => {
         method: body.paymentInfo.method,
         paidAt: body.paymentInfo.paidAt || new Date().toISOString(),
       },
-      orderStatus: body.orderStatus || "Processing",
+      orderStatus: body.orderStatus || "Confirmed",
       createdAt: new Date(body.createdAt).toISOString(),
     });
 

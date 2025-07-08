@@ -7,7 +7,7 @@ export const authConfig = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 12, // 12 days in seconds
+    maxAge: 60 * 60 * 24 * 12,
   },
   serviceAccount: {
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,

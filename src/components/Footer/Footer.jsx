@@ -145,7 +145,7 @@ export default function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-black">
-            @Cycledaddy 2025, All rights reserved.
+            @CycleDaddy 2021-2025, All rights reserved.
           </p>
           <div className="flex w-full gap-2 md:w-auto">
             <Input

@@ -174,28 +174,6 @@ const Navbar = () => {
             },
           ],
         },
-        {
-          name: "Safety Gear",
-          href: "/category/brakes-and-safety/safety-gear",
-          subSubCategories: [
-            {
-              name: "Helmets",
-              href: "/category/brakes-and-safety/safety-gear/helmets",
-            },
-            {
-              name: "Lights",
-              href: "/category/brakes-and-safety/safety-gear/lights",
-            },
-            {
-              name: "Mirrors",
-              href: "/category/brakes-and-safety/safety-gear/mirrors",
-            },
-            {
-              name: "Locks",
-              href: "/category/brakes-and-safety/safety-gear/locks",
-            },
-          ],
-        },
       ],
     },
     {
@@ -250,6 +228,40 @@ const Navbar = () => {
       href: "/category/accessories-and-essentials",
       subCategories: [
         {
+          name: "Riding Accessories",
+          href: "/category/accessories-and-essentials/riding-accessories",
+          subSubCategories: [
+            {
+              name: "Handle Bar Tapes",
+              href: "/category/accessories-and-essentials/riding-accessories/handle-bar-tapes",
+            },
+            {
+              name: "Clothing & Accessories",
+              href: "/category/accessories-and-essentials/riding-accessories/clothing-and-accessories",
+            },
+            {
+              name: "Cycling Shoes",
+              href: "/category/accessories-and-essentials/riding-accessories/cycling-shoes",
+            },
+            {
+              name: "Helmets",
+              href: "/category/accessories-and-essentials/riding-accessories/helmets",
+            },
+            {
+              name: "Lights",
+              href: "/category/accessories-and-essentials/riding-accessories/lights",
+            },
+            {
+              name: "Mirrors",
+              href: "/category/accessories-and-essentials/riding-accessories/mirrors",
+            },
+            {
+              name: "Locks",
+              href: "/category/accessories-and-essentials/riding-accessories/locks",
+            },
+          ],
+        },
+        {
           name: "Cycling Essentials",
           href: "/category/accessories-and-essentials/cycling-essentials",
           subSubCategories: [
@@ -285,24 +297,7 @@ const Navbar = () => {
             },
           ],
         },
-        {
-          name: "Riding Accessories",
-          href: "/category/accessories-and-essentials/riding-accessories",
-          subSubCategories: [
-            {
-              name: "Handle Bar Tapes",
-              href: "/category/accessories-and-essentials/riding-accessories/handle-bar-tapes",
-            },
-            {
-              name: "Clothing & Accessories",
-              href: "/category/accessories-and-essentials/riding-accessories/clothing-and-accessories",
-            },
-            {
-              name: "Cycling Shoes",
-              href: "/category/accessories-and-essentials/riding-accessories/cycling-shoes",
-            },
-          ],
-        },
+
         {
           name: "Tools & Maintenance",
           href: "/category/accessories-and-essentials/tools-and-maintenance",
@@ -413,54 +408,69 @@ const Navbar = () => {
 
             {/* Desktop Navigation */}
             <div className="items-center hidden space-x-8 custom:flex">
-              {categories.map((category) => (
-                <div key={category.name} className="relative group">
-                  <Link
-                    href={category.href}
-                    className="hover:text-[#02D866] text-m drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)] transition-colors py-2"
-                  >
-                    {category.name}
-                  </Link>
-                  {/* Desktop Dropdown */}
-                  <div className="absolute left-0 invisible w-48 mt-2 transition-all opacity-0 group-hover:visible group-hover:opacity-100">
-                    {category.subCategories?.length > 0 && (
-                      <div className="py-2 rounded-lg shadow-lg backdrop-blur-md bg-primary">
-                        {category.subCategories.map((subCategories) => (
-                          <div
-                            key={subCategories.name}
-                            className="relative group/sub"
-                          >
-                            <Link
-                              href={subCategories.href}
-                              className="block px-4 py-2 text-gray-200 hover:text-[#02D866] transition-colors"
+              {categories.map((category, index) => {
+                // Check if this is one of the last few items that might overflow
+                const isRightAligned = index >= categories.length - 1;
+
+                return (
+                  <div key={category.name} className="relative group">
+                    <Link
+                      href={category.href}
+                      className="hover:text-[#02D866] text-m drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)] transition-colors py-2"
+                    >
+                      {category.name}
+                    </Link>
+                    {/* Desktop Dropdown */}
+                    <div
+                      className={`absolute mt-2 w-48 transition-all opacity-0 invisible group-hover:visible group-hover:opacity-100 ${
+                        isRightAligned ? "right-0" : "left-0"
+                      }`}
+                    >
+                      {category.subCategories?.length > 0 && (
+                        <div className="py-2 rounded-lg shadow-lg backdrop-blur-md bg-primary">
+                          {category.subCategories.map((subCategories) => (
+                            <div
+                              key={subCategories.name}
+                              className="relative group/sub"
                             >
-                              {subCategories.name}
-                            </Link>
-                            {/* Desktop Sub-Dropdown */}
-                            <div className="absolute top-0 invisible w-48 transition-all opacity-0 left-full group-hover/sub:visible group-hover/sub:opacity-100">
-                              {subCategories.subSubCategories?.length > 0 && (
-                                <div className="py-2 ml-2  rounded-lg shadow-lg backdrop-blur-md bg-[#0A6E45]">
-                                  {subCategories.subSubCategories.map(
-                                    (subSub) => (
-                                      <Link
-                                        key={subSub.name}
-                                        href={subSub.href}
-                                        className="block px-4 py-2 text-gray-200 hover:text-[#02D866] transition-colors"
-                                      >
-                                        {subSub.name}
-                                      </Link>
-                                    )
-                                  )}
-                                </div>
-                              )}
+                              <Link
+                                href={subCategories.href}
+                                className="block px-4 py-2 text-gray-200 hover:text-[#02D866] transition-colors"
+                              >
+                                {subCategories.name}
+                              </Link>
+                              {/* Desktop Sub-Dropdown */}
+                              <div
+                                className={`absolute top-0 w-48 transition-all opacity-0 invisible group-hover/sub:visible group-hover/sub:opacity-100 ${
+                                  isRightAligned
+                                    ? "right-full mr-2"
+                                    : "left-full ml-2"
+                                }`}
+                              >
+                                {subCategories.subSubCategories?.length > 0 && (
+                                  <div className="py-2 rounded-lg shadow-lg backdrop-blur-md bg-[#0A6E45]">
+                                    {subCategories.subSubCategories.map(
+                                      (subSub) => (
+                                        <Link
+                                          key={subSub.name}
+                                          href={subSub.href}
+                                          className="block px-4 py-2 text-gray-200 hover:text-[#02D866] transition-colors"
+                                        >
+                                          {subSub.name}
+                                        </Link>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Icons */}

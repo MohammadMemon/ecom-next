@@ -5,32 +5,25 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { generateOrderId } from "@/utils/generateOrderId";
+import { sendOrderNotifications } from "@/utils/orderEmail";
 
-// WhatsApp/Email notification functions (implement as needed)
 const sendNotifications = async (orderData) => {
   try {
-    // Send admin notification
-    await sendAdminNotification(orderData);
+    // Send Email notification
+    await sendEmailNotification(orderData);
 
-    // Send customer confirmation
-    await sendCustomerConfirmation(orderData);
-
-    console.log("Notifications sent successfully");
+    // Send WhatsApp confirmation
+    await sendWhatsAppNotification(orderData);
   } catch (error) {
     console.error("Notification error:", error);
   }
 };
 
-const sendAdminNotification = async (orderData) => {
-  // Implement WhatsApp/Email notification to admin
-  // Example: WhatsApp API call or Email service
-  console.log("Admin notification sent for order:", orderData.orderId);
+const sendEmailNotification = async (orderData) => {
+  await sendOrderNotifications(orderData);
 };
 
-const sendCustomerConfirmation = async (orderData) => {
-  // Implement customer confirmation email/SMS
-  console.log("Customer confirmation sent for order:", orderData.orderId);
-};
+const sendWhatsAppNotification = async (orderData) => {};
 
 export async function POST(request) {
   try {
@@ -42,13 +35,13 @@ export async function POST(request) {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      // Order data
       user,
       shippingInfo,
       orderItems,
       itemsPrice,
       shippingPrice,
       totalPrice,
+      businessName,
     } = body;
 
     // Validate required fields
@@ -159,18 +152,22 @@ export async function POST(request) {
       console.error("Revalidation error:", revalidationError);
     }
 
-    // STEP 6: Send notifications
-    // await sendNotifications({
-    //   orderId: createdOrder._id,
-    //   paymentId: razorpay_payment_id,
-    //   customerEmail: shippingInfo.email,
-    //   customerName: shippingInfo.name,
-    //   items: orderItems,
-    //   totalPrice,
-    //   businessName,
-    // });
+    const shippingAddress = `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.pincode} ${shippingInfo.country} `;
+    console.log(shippingAddress);
+    // Send notifications
+    sendNotifications({
+      orderId: orderId,
+      paymentId: razorpay_payment_id,
+      customerEmail: shippingInfo.email,
+      customerName: shippingInfo.name,
+      customerPhone: shippingInfo.phone,
+      shippingAddress: shippingAddress,
+      items: orderItems,
+      totalPrice,
+      businessName,
+    });
 
-    // STEP 7: Return success response
+    // success response
     return NextResponse.json(
       {
         success: true,

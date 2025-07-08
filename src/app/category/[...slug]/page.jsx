@@ -1,7 +1,7 @@
 import CategoryClient from "./CategoryClient";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-export const fetchCache = "force-cache";
+// export const fetchCache = "force-cache";
 
 export default async function Page({ params }) {
   const resolvedParams = await params;
@@ -31,6 +31,10 @@ export default async function Page({ params }) {
   const data = await res.json();
 
   const products = data.products || [];
+
+  const formattedIds = data.products.map((p) => `"${p._id}"`).join(",\n");
+
+  console.log(formattedIds);
 
   const currentCategoryLabel =
     slugParts.length === 1

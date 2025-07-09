@@ -51,28 +51,45 @@ export default function Footer() {
           </div>
           <div className="flex gap-4">
             <Link
-              href="#"
-              className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
+              legacyBehavior
+              href="https://www.instagram.com/cycledaddy.in/"
             >
-              <Facebook className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+              <a
+                target="_blank"
+                className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
+              >
+                <Instagram className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+              </a>
+            </Link>
+            <Link legacyBehavior href="https://www.youtube.com/@cycledaddy6477">
+              <a
+                target="_blank"
+                className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
+              >
+                <Youtube className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+              </a>
             </Link>
             <Link
-              href="#"
-              className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
+              legacyBehavior
+              href="https://www.facebook.com/share/16jStX9Bu8/?mibextid=qi2Omg"
             >
-              <Instagram className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+              <a
+                target="_blank"
+                className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
+              >
+                <Facebook className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+              </a>
             </Link>
             <Link
-              href="#"
-              className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
+              legacyBehavior
+              href="https://www.linkedin.com/company/cycle-daddy"
             >
-              <Linkedin className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
-            </Link>
-            <Link
-              href="#"
-              className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
-            >
-              <Youtube className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+              <a
+                target="_blank"
+                className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
+              >
+                <Linkedin className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+              </a>
             </Link>
           </div>
         </div>
@@ -157,16 +174,12 @@ export default function Footer() {
             <Button
               className="bg-[#02D866] text-black border hover:text-white hover:border-white px-6"
               onClick={() => {
-                <a
-                  href={`https://wa.me/917977509402?text=${encodeURIComponent(
+                window.open(
+                  `https://wa.me/+917977509402?text=${encodeURIComponent(
                     `I have a question about: ${question}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="your-button-classes-here"
-                >
-                  Contact on WhatsApp
-                </a>;
+                  )}`,
+                  "_blank"
+                );
               }}
             >
               Send

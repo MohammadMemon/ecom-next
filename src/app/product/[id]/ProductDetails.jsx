@@ -20,12 +20,10 @@ import {
   Headset,
   ShieldCheck,
 } from "lucide-react";
-import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import useCartStore from "@/store/cartStore";
-import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import useRecentlyViewedStore from "@/store/recentlyViewedStore";
@@ -380,7 +378,7 @@ export default function ProductDetails({ product }) {
                     window.open(
                       `https://wa.me/+917977509402?text=${encodeURIComponent(
                         "Hi, I'm interested in this product: http://cycledaddy.in/product/" +
-                          useParams.id
+                          product._id
                       )}`,
                       "_blank"
                     );

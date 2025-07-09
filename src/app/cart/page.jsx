@@ -29,13 +29,9 @@ export default function CartPage() {
     incrementQuantity,
     decrementQuantity,
     clearCart,
-    getTotalPrice,
-    getTotalItems,
     getCartSummary,
     getOrderData,
     validateCartStock,
-    getStockValidationResult,
-    clearStockValidationResult,
   } = useCartStore();
 
   const [isClearing, setIsClearing] = useState(false);

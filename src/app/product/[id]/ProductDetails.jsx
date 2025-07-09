@@ -28,6 +28,7 @@ import useCartStore from "@/store/cartStore";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import useRecentlyViewedStore from "@/store/recentlyViewedStore";
 
 export default function ProductDetails({ product }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -36,7 +37,7 @@ export default function ProductDetails({ product }) {
 
   const [api, setApi] = useState();
 
-  const { addRecentlyViewed } = useRecentlyViewed();
+  const { addProduct } = useRecentlyViewedStore();
 
   const { addItem, isItemInCart } = useCartStore();
 
@@ -61,15 +62,9 @@ export default function ProductDetails({ product }) {
   };
 
   useEffect(() => {
-    if (!product) return;
-    addRecentlyViewed({
-      _id: product._id,
-      name: product.name,
-      brand: product.brand,
-      price: product.price,
-      images: product.images?.[0] || "", // handle missing image
-      stock: product.stock,
-    });
+    if (product) {
+      addProduct(product);
+    }
   }, [product]);
 
   const plugin = React.useRef(

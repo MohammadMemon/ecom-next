@@ -3,23 +3,27 @@
 import Hero from "@/components/Home/Hero";
 import RecentlyViewed from "@/components/Home/recentlyViewed";
 import { useToast } from "@/hooks/use-toast";
+import useRecentlyViewedStore from "@/store/recentlyViewedStore";
 import Image from "next/image";
-
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [hasRecentlyViewed, setHasRecentlyViewed] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const products = useRecentlyViewedStore((state) => state.products);
+  const getProductsWithStock = useRecentlyViewedStore(
+    (state) => state.getProductsWithStock
+  );
+
+  const hasRecentlyViewed = products.length > 0;
+
   useEffect(() => {
-    try {
-      const exists = localStorage.getItem("recentlyViewedProducts");
-      setHasRecentlyViewed(!!exists);
-    } catch (error) {
-      console.error("Invalid recentlyViewedProducts data:", error);
-    } finally {
+    // Simple timeout to allow store hydration
+    const timer = setTimeout(() => {
       setLoading(false);
-    }
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -28,10 +32,11 @@ export default function Home() {
         <Hero />
 
         {loading ? (
-          <div className="h-[300px] w-full" /> // Reserve space during loading
+          <div className="h-[300px] w-full" />
         ) : hasRecentlyViewed ? (
           <RecentlyViewed />
         ) : null}
+
         {!loading && (
           <div className="py-4 mx-4">
             <Image

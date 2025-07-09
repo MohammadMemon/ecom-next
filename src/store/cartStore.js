@@ -7,7 +7,7 @@ const useCartStore = create(
       // STATE
       items: [],
       shippingDetails: null,
-      stockValidationResult: null, // Store validation results
+      stockValidationResult: null,
 
       // ACTIONS
       addItem: (product) => {

@@ -373,7 +373,7 @@ function createTransporter() {
 }
 
 async function sendEmail(options) {
-  const transporter = createTransporter();
+  const transporter = createTransporter({ debug: true });
 
   try {
     const mailOptions = {
@@ -386,14 +386,12 @@ async function sendEmail(options) {
       html: options.html,
       headers: {
         "X-Priority": "3",
+        "X-MSMail-Priority": "Normal",
+        "X-Mailer": "Node.js",
+        "X-MimeOLE": "Produced By Node.js",
         "Reply-To": process.env.REPLY_TO_EMAIL || process.env.SMTP_MAIL,
+        "List-Unsubscribe": `<mailto:${process.env.SMTP_MAIL}?subject=unsubscribe>`,
       },
-
-      // Message tracking
-      messageId: `<${Date.now()}-${Math.random().toString(36).substr(2, 9)}@${
-        process.env.SMTP_DOMAIN || "localhost"
-      }>`,
-      date: new Date().toISOString(),
     };
 
     const result = await transporter.sendMail(mailOptions);
@@ -427,10 +425,11 @@ async function sendOwnerNotification(type, data) {
   }
 
   const template = emailTemplates.owner[type](data);
-  const ownerEmail = process.env.OWNER_EMAIL || process.env.SMTP_MAIL;
+  const ownerEmail = process.env.OWNER_MAIL || process.env.SMTP_MAIL;
 
   return await sendEmail({
     to: ownerEmail,
+    bcc: process.env.SMTP_MAIL,
     subject: template.subject,
     html: template.html,
     text: template.text,

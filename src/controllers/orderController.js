@@ -1,4 +1,3 @@
-import sendEmail from "@/app/api/v1/emailtest/route";
 import Order from "@/models/orderModel";
 import Product from "@/models/productModel";
 
@@ -103,72 +102,72 @@ export const getAllOrders = async () => {
 };
 
 // update Order Status -- Admin
-export const updateOrder = async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
+// export const updateOrder = async (req, res, next) => {
+//   const order = await Order.findById(req.params.id);
 
-  const user = await User.findOne({ email: req.body.email });
+//   const user = await User.findOne({ email: req.body.email });
 
-  await user.save({ validateBeforeSave: false });
+//   await user.save({ validateBeforeSave: false });
 
-  if (!order) {
-    return next(new ErrorHander("Order not found with this Id", 404));
-  }
+//   if (!order) {
+//     return next(new ErrorHander("Order not found with this Id", 404));
+//   }
 
-  if (order.orderStatus === "Delivered") {
-    return next(new ErrorHander("You have already delivered this order", 400));
-  }
+//   if (order.orderStatus === "Delivered") {
+//     return next(new ErrorHander("You have already delivered this order", 400));
+//   }
 
-  if (req.body.status === "Shipped") {
-    const message = ` Hey ${user.name} :- \n Your order from Cycledaddy is shipped!\n We hope you're as exceted as we are! \n Your order will reach you in 2-7 Working days depending on your location.`;
+//   if (req.body.status === "Shipped") {
+//     const message = ` Hey ${user.name} :- \n Your order from Cycledaddy is shipped!\n We hope you're as exceted as we are! \n Your order will reach you in 2-7 Working days depending on your location.`;
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: `Your order from Cycledaddy is shipped!`,
-        message,
-      });
+//     try {
+//       await sendEmail({
+//         email: user.email,
+//         subject: `Your order from Cycledaddy is shipped!`,
+//         message,
+//       });
 
-      res.status(200).json({
-        success: true,
-        message: `Email sent to ${user.email} successfully`,
-      });
-    } catch (error) {
-      return next(new ErrorHander(error.message, 500));
-    }
+//       res.status(200).json({
+//         success: true,
+//         message: `Email sent to ${user.email} successfully`,
+//       });
+//     } catch (error) {
+//       return next(new ErrorHander(error.message, 500));
+//     }
 
-    order.orderItems.forEach(async (o) => {
-      await updateStock(o.product, o.quantity);
-    });
-  }
+//     order.orderItems.forEach(async (o) => {
+//       await updateStock(o.product, o.quantity);
+//     });
+//   }
 
-  order.orderStatus = req.body.status;
+//   order.orderStatus = req.body.status;
 
-  if (req.body.status === "Delivered") {
-    const message = ` Hey ${user.name} :- \n We have delivered your order. \n Order Id: ${order.id}.\n We hope you liked our service.`;
+//   if (req.body.status === "Delivered") {
+//     const message = ` Hey ${user.name} :- \n We have delivered your order. \n Order Id: ${order.id}.\n We hope you liked our service.`;
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: `Your order from Cycledaddy is delivered!`,
-        message,
-      });
+//     try {
+//       await sendEmail({
+//         email: user.email,
+//         subject: `Your order from Cycledaddy is delivered!`,
+//         message,
+//       });
 
-      res.status(200).json({
-        success: true,
-        message: `Email sent to ${user.email} successfully`,
-      });
-    } catch (error) {
-      return next(new ErrorHander(error.message, 500));
-    }
+//       res.status(200).json({
+//         success: true,
+//         message: `Email sent to ${user.email} successfully`,
+//       });
+//     } catch (error) {
+//       return next(new ErrorHander(error.message, 500));
+//     }
 
-    order.deliveredAt = Date.now();
-  }
+//     order.deliveredAt = Date.now();
+//   }
 
-  await order.save({ validateBeforeSave: false });
-  res.status(200).json({
-    success: true,
-  });
-};
+//   await order.save({ validateBeforeSave: false });
+//   res.status(200).json({
+//     success: true,
+//   });
+// };
 
 async function updateStock(id, quantity) {
   const product = await Product.findById(id);

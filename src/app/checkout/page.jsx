@@ -10,6 +10,7 @@ import { initiatePayment } from "@/utils/payment";
 import { googleProvider } from "@/firebase/client";
 import { getAuth } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import Stepper from "@/components/ui/stepper";
 
 export default function CheckoutPage() {
   const isMounted = useMounted();
@@ -195,43 +196,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="container px-4 py-8 mx-auto">
-      {/* Progress Steps */}
-      <div className="mb-8">
-        <div className="flex items-center justify-center">
-          <div className="flex items-center space-x-4">
-            {[1, 2, 3].map((step) => (
-              <div key={step} className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    step <= currentStep
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  {step}
-                </div>
-                <span
-                  className={`ml-2 text-sm ${
-                    step <= currentStep
-                      ? "text-primary font-semibold"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {step === 1 ? "Shipping" : step === 2 ? "Review" : "Payment"}
-                </span>
-                {step < 3 && (
-                  <div
-                    className={`w-12 h-0.5 mx-4 ${
-                      step < currentStep ? "bg-primary" : "bg-gray-200"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
+      <Stepper currentStep={currentStep} />
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2">

@@ -1,7 +1,7 @@
 import CategoryClient from "./CategoryClient";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-// export const fetchCache = "force-cache";
+export const fetchCache = "force-cache";
 
 export default async function Page({ params }) {
   const resolvedParams = await params;

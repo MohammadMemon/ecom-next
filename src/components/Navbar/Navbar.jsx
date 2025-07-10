@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, X, ShoppingCart, User, Search } from "lucide-react";
 import Image from "next/image";
 import useCartStore from "@/store/cartStore";
+import SearchModal from "./SearchModal";
 
 const Navbar = () => {
   // State for menu visibility
@@ -475,12 +476,7 @@ const Navbar = () => {
 
             {/* Icons */}
             <div className="flex items-center space-x-4">
-              <Link
-                href="/search"
-                className="hover:text-[#02D866] transition-colors"
-              >
-                <Search className="w-6 h-6" />
-              </Link>
+              <SearchModal />
               <Link
                 href="/auth/authtest"
                 className="hover:text-[#02D866] transition-colors"

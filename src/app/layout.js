@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import { Analytics } from "@vercel/analytics/next";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +43,9 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-primary-foreground flex flex-col`}
       >
         <Navbar />
-        <main className="flex-1 pt-[80px]">{children}</main>
+        <Suspense>
+          <main className="flex-1 pt-[80px]">{children}</main>
+        </Suspense>
         <Toaster />
         <SpeedInsights />
         <Analytics />

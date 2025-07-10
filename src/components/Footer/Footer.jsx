@@ -50,47 +50,35 @@ export default function Footer() {
             <span className="text-2xl font-bold">CycleDaddy</span>
           </div>
           <div className="flex gap-4">
-            <Link
-              legacyBehavior
+            <a
               href="https://www.instagram.com/cycledaddy.in/"
+              target="_blank"
+              className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
             >
-              <a
-                target="_blank"
-                className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
-              >
-                <Instagram className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
-              </a>
-            </Link>
-            <Link legacyBehavior href="https://www.youtube.com/@cycledaddy6477">
-              <a
-                target="_blank"
-                className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
-              >
-                <Youtube className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
-              </a>
-            </Link>
-            <Link
-              legacyBehavior
+              <Instagram className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+            </a>
+            <a
+              href="https://www.youtube.com/@cycledaddy6477"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
+            >
+              <Youtube className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+            </a>
+            <a
               href="https://www.facebook.com/share/16jStX9Bu8/?mibextid=qi2Omg"
+              target="_blank"
+              className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
             >
-              <a
-                target="_blank"
-                className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
-              >
-                <Facebook className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
-              </a>
-            </Link>
-            <Link
-              legacyBehavior
+              <Facebook className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+            </a>
+            <a
               href="https://www.linkedin.com/company/cycle-daddy"
+              target="_blank"
+              className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
             >
-              <a
-                target="_blank"
-                className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
-              >
-                <Linkedin className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
-              </a>
-            </Link>
+              <Linkedin className="w-5 h-5 text-primary-foreground group-hover:text-[#02D866]" />
+            </a>
           </div>
         </div>
 

@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // Added router for navigation
+import { useRouter } from "next/navigation";
 import Portal from "../ui/portal";
 import { Button } from "../ui/button";
 
 export default function SearchModal() {
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState([]);
@@ -43,26 +43,28 @@ export default function SearchModal() {
     }
   }, [query]);
 
-  const handleSearch = () => {
-    if (!query.trim()) return;
+  const performSearch = (searchQuery) => {
+    if (!searchQuery.trim()) return;
 
     // Update recent searches
     const updatedSearches = [
-      query,
-      ...recentSearches.filter((item) => item !== query).slice(0, 4),
+      searchQuery,
+      ...recentSearches.filter((item) => item !== searchQuery).slice(0, 4),
     ];
     setRecentSearches(updatedSearches);
     localStorage.setItem("recentSearches", JSON.stringify(updatedSearches));
 
     setIsOpen(false);
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+  };
 
-    // Navigate to search page
-    router.push(`/search?q=${encodeURIComponent(query)}`);
+  const handleSearch = () => {
+    performSearch(query);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      handleSearch();
+      performSearch(query);
     }
   };
 
@@ -141,10 +143,7 @@ export default function SearchModal() {
                     {suggestions.map((suggestion, index) => (
                       <button
                         key={index}
-                        onClick={() => {
-                          setQuery(suggestion);
-                          handleSearch();
-                        }}
+                        onClick={() => performSearch(suggestion)}
                         className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
                       >
                         {suggestion}
@@ -164,10 +163,7 @@ export default function SearchModal() {
                       {recentSearches.map((search, index) => (
                         <button
                           key={index}
-                          onClick={() => {
-                            setQuery(search);
-                            handleSearch();
-                          }}
+                          onClick={() => performSearch(search)}
                           className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
                         >
                           {search}
@@ -185,10 +181,7 @@ export default function SearchModal() {
                     {popularSearches.map((search, index) => (
                       <button
                         key={index}
-                        onClick={() => {
-                          setQuery(search);
-                          handleSearch();
-                        }}
+                        onClick={() => performSearch(search)}
                         className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
                       >
                         {search}

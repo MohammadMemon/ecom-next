@@ -32,6 +32,24 @@ export default function SearchPage() {
         const data = await response.json();
         if (data.success) {
           setAllProducts(data.products);
+
+          // Calculate initial price range
+          let minPrice = Number.POSITIVE_INFINITY;
+          let maxPrice = 0;
+          data.products.forEach((product) => {
+            if (product.price < minPrice) minPrice = product.price;
+            if (product.price > maxPrice) maxPrice = product.price;
+          });
+
+          // Reset filters when new search is performed
+          setFilters({
+            brands: [],
+            subCategories: [],
+            minPrice: Math.floor(minPrice) || 0,
+            maxPrice: Math.ceil(maxPrice) || 100000,
+            inStock: false,
+            sort: "relevance",
+          });
         }
       } catch (error) {
         console.error("Failed to fetch search results:", error);
@@ -111,6 +129,8 @@ export default function SearchPage() {
         return [...result].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
+      case "in_stock_first":
+        return [...result].sort((a, b) => b.stock - a.stock);
       default: // relevance
         return result;
     }
@@ -311,32 +331,52 @@ export default function SearchPage() {
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-4">
-              {/* Sorting dropdown */}
-              <div className="flex items-center">
-                <label className="mr-2 text-sm font-medium text-gray-700">
-                  Sort by:
-                </label>
-                <select
-                  name="sort"
-                  value={filters.sort}
-                  onChange={handleFilterChange}
-                  className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#02D866]"
+              <div className="flex justify-center w-full gap-2 lg:hidden">
+                <div className="flex items-center ">
+                  <label className="hidden mr-2 text-sm font-medium text-gray-700 ">
+                    Sort by:
+                  </label>
+                  <select
+                    name="sort"
+                    value={filters.sort}
+                    onChange={handleFilterChange}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#02D866]"
+                  >
+                    <option value="relevance">Relevance</option>
+                    <option value="in_stock_first">In Stock</option>
+                    <option value="newest">Newest</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                  </select>
+                </div>
+                <Button
+                  onClick={() => setIsFilterOpen(true)}
+                  className="flex items-center justify-center px-4 py-2 text-white rounded-md hover:bg-[#02b859] transition-colors lg:hidden"
                 >
-                  <option value="relevance">Relevance</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                  <option value="newest">Newest Arrivals</option>
-                </select>
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filters
+                </Button>{" "}
               </div>
 
-              {/* Mobile filter button */}
-              <Button
-                onClick={() => setIsFilterOpen(true)}
-                className="flex items-center justify-center px-4 py-2 text-white rounded-md lg:hidden hover:bg-[#02b859] transition-colors"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-              </Button>
+              <div className="items-center hidden space-x-4 lg:flex">
+                <div className="flex items-center">
+                  <label className="mr-2 text-sm font-medium text-gray-700">
+                    Sort by:
+                  </label>
+                  <select
+                    name="sort"
+                    value={filters.sort}
+                    onChange={handleFilterChange}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#02D866]"
+                  >
+                    <option value="relevance">Relevance</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="newest">Newest Arrivals</option>
+                    <option value="in_stock_first">In Stock First</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
         </div>

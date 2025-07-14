@@ -87,106 +87,110 @@ export default function SearchModal() {
       {isOpen && (
         <Portal>
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm"
             onClick={handleBackdropClick}
           >
-            <div
-              className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-primary">
-                  Search Products
-                </h2>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1 text-gray-500 rounded-full hover:bg-gray-100"
+            <div className="relative sm:flex sm:min-h-[100svh] sm:justify-center sm:items-center p-4 pt-12 sm:pt-0">
+              <div className="absolute left-0 w-full top-[15vh] sm:static sm:w-auto sm:left-auto sm:top-auto sm:translate-x-0">
+                <div
+                  className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="flex gap-2 mb-4">
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    placeholder="Search for products..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#02D866]"
-                    autoFocus
-                  />
-                  {query && (
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-primary">
+                      Search Products
+                    </h2>
                     <button
-                      onClick={() => setQuery("")}
-                      className="absolute text-gray-400 transform -translate-y-1/2 right-2 top-1/2 hover:text-gray-600"
+                      onClick={() => setIsOpen(false)}
+                      className="p-1 text-gray-500 rounded-full hover:bg-gray-100"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5" />
                     </button>
-                  )}
-                </div>
-                <Button
-                  onClick={handleSearch}
-                  className="px-4 py-2 text-white rounded-lg hover:bg-[#02b859] transition-colors flex items-center"
-                >
-                  <Search className="w-4 h-4 mr-1" />
-                </Button>
-              </div>
-
-              {suggestions.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="mb-2 text-sm font-medium text-gray-500">
-                    Suggestions
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => performSearch(suggestion)}
-                        className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
                   </div>
-                </div>
-              )}
 
-              <div className="space-y-4">
-                {recentSearches.length > 0 && (
-                  <div>
-                    <h3 className="mb-2 text-sm font-medium text-gray-500">
-                      Recent Searches
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {recentSearches.map((search, index) => (
+                  <div className="flex gap-2 mb-4">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        placeholder="Search for products..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#02D866]"
+                        autoFocus
+                      />
+                      {query && (
                         <button
-                          key={index}
-                          onClick={() => performSearch(search)}
-                          className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
+                          onClick={() => setQuery("")}
+                          className="absolute text-gray-400 transform -translate-y-1/2 right-2 top-1/2 hover:text-gray-600"
                         >
-                          {search}
+                          <X className="w-4 h-4" />
                         </button>
-                      ))}
+                      )}
                     </div>
+                    <Button
+                      onClick={handleSearch}
+                      className="px-4 py-2 text-white rounded-lg hover:bg-[#02b859] transition-colors flex items-center"
+                    >
+                      <Search className="w-4 h-4 mr-1" />
+                    </Button>
                   </div>
-                )}
 
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-500">
-                    Popular Searches
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {popularSearches.map((search, index) => (
-                      <button
-                        key={index}
-                        onClick={() => performSearch(search)}
-                        className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
-                      >
-                        {search}
-                      </button>
-                    ))}
+                  {suggestions.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="mb-2 text-sm font-medium text-gray-500">
+                        Suggestions
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {suggestions.map((suggestion, index) => (
+                          <button
+                            key={index}
+                            onClick={() => performSearch(suggestion)}
+                            className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    {recentSearches.length > 0 && (
+                      <div>
+                        <h3 className="mb-2 text-sm font-medium text-gray-500">
+                          Recent Searches
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {recentSearches.map((search, index) => (
+                            <button
+                              key={index}
+                              onClick={() => performSearch(search)}
+                              className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
+                            >
+                              {search}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <h3 className="mb-2 text-sm font-medium text-gray-500">
+                        Popular Searches
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {popularSearches.map((search, index) => (
+                          <button
+                            key={index}
+                            onClick={() => performSearch(search)}
+                            className="px-3 py-1 text-sm bg-gray-100 hover:bg-[#02D866] hover:text-white rounded-full transition-colors"
+                          >
+                            {search}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

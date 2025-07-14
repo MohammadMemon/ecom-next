@@ -40,7 +40,7 @@ export default function Home() {
         {!loading && (
           <div className="py-4 mx-4">
             <Image
-              src="/banner1.png"
+              src="/Banner1.png"
               alt="Slide 2"
               width={1200}
               height={900}

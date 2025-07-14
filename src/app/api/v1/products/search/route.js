@@ -94,7 +94,6 @@ export async function GET(request) {
       },
       {
         $addFields: {
-          // Combine all boosts with base score
           relevanceScore: {
             $add: [
               "$baseScore",
@@ -107,7 +106,7 @@ export async function GET(request) {
         },
       },
       {
-        $sort: { relevanceScore: -1 }, // Sort by custom relevance
+        $sort: { relevanceScore: -1, _id: 1 },
       },
       {
         $project: {

@@ -55,7 +55,9 @@ export default function OrderConfirmed() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-        <div className="w-12 h-12 border-4 border-green-500 rounded-full animate-spin border-t-transparent"></div>
+        <div className="flex items-center justify-center min-h-[8rem] w-full">
+          <Loader fullScreen={false} />
+        </div>
       </div>
     );
   }

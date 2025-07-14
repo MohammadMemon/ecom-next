@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Filter, X } from "lucide-react";
 import ProductCard from "@/components/Product/ProductCard";
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/loader";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -394,7 +395,9 @@ export default function SearchPage() {
           <div className="flex-1 min-w-0">
             {loading ? (
               <div className="flex items-center justify-center h-64">
-                <div className="w-12 h-12 border-t-2 border-b-2 border-[#02D866] rounded-full animate-spin"></div>
+                <div className="flex items-center justify-center min-h-[8rem] w-full">
+                  <Loader fullScreen={false} />
+                </div>
               </div>
             ) : filteredProducts.length > 0 ? (
               <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">

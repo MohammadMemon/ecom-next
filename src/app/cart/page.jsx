@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useMounted } from "@/hooks/useMounted";
+import Loader from "@/components/ui/loader";
 
 export default function CartPage() {
   const isMounted = useMounted();
@@ -105,17 +106,17 @@ export default function CartPage() {
         variant: "destructive",
       });
       return;
+    } else {
+      updateQuantity(item._id, newQuantity);
     }
-    updateQuantity(item._id, newQuantity);
   };
 
   if (!isMounted) {
     return (
       <div className="container px-4 py-8 mx-auto">
         <div className="py-16 text-center">
-          <div className="animate-pulse">
-            <div className="w-48 h-8 mx-auto mb-4 bg-gray-200 rounded"></div>
-            <div className="w-64 h-4 mx-auto bg-gray-200 rounded"></div>
+          <div className="flex items-center justify-center min-h-[8rem] w-full">
+            <Loader fullScreen={false} />
           </div>
         </div>
       </div>
@@ -126,8 +127,9 @@ export default function CartPage() {
     return (
       <div className="container px-4 py-8 mx-auto">
         <div className="py-16 text-center">
-          <div className="w-12 h-12 mx-auto mb-4 border-b-2 border-blue-600 rounded-full animate-spin"></div>
-          <p className="text-gray-600">Checking product availability...</p>
+          <div className="flex items-center justify-center min-h-[8rem] w-full">
+            <Loader fullScreen={false} />
+          </div>
         </div>
       </div>
     );
@@ -198,11 +200,11 @@ export default function CartPage() {
                 {items.map((item) => (
                   <div
                     key={item._id}
-                    className="flex flex-col p-4 border rounded-lg border-primary sm:flex-row sm:items-center sm:gap-4"
+                    className="flex flex-col p-4 border rounded-lg border-primary sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                   >
-                    {/* First Row (Image + Name) - Expands */}
-                    <Link href={`/product/${item._id}`}>
-                      <div className="flex items-center flex-1 gap-4">
+                    {/* First Row (Image + Name) - Left Side */}
+                    <Link href={`/product/${item._id}`} className="flex-1">
+                      <div className="flex items-center gap-4">
                         {/* Product Image */}
                         <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-md">
                           {item.images ? (
@@ -230,8 +232,8 @@ export default function CartPage() {
                       </div>
                     </Link>
 
-                    {/* Second Row (Quantity + Total + Remove) - Fixed Width */}
-                    <div className="flex items-center justify-between w-full gap-6 mt-4 sm:mt-0 sm:justify-end sm:w-auto">
+                    {/* Second Row (Quantity + Total + Remove) - Right Side */}
+                    <div className="flex items-center gap-6 mt-4 sm:mt-0">
                       {/* Quantity Controls */}
                       <div className="flex items-center border border-gray-300 rounded-lg">
                         <button

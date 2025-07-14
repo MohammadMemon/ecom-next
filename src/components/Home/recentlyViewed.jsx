@@ -3,6 +3,7 @@
 import ProductCard from "@/components/Product/ProductCard";
 import useRecentlyViewedStore from "@/store/recentlyViewedStore";
 import { useEffect, useState } from "react";
+import Loader from "../ui/loader";
 
 export default function RecentlyViewed() {
   const [loading, setLoading] = useState(true);
@@ -33,11 +34,8 @@ export default function RecentlyViewed() {
   if (loading) {
     return (
       <div className="container w-[95vw] px-0 xs:w-[90vw] xs:p-3 sm:w-[75vw] sm:p-6 mx-auto">
-        <h1 className="mb-6 text-2xl font-bold text-center">
-          Recently Viewed Product
-        </h1>
-        <div className="flex items-center justify-center h-32">
-          <p>Loading...</p>
+        <div className="flex items-center justify-center min-h-[8rem] w-full">
+          <Loader fullScreen={false} />
         </div>
       </div>
     );

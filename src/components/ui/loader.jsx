@@ -26,7 +26,7 @@ export default function Loader({ fullScreen = true }) {
     <div
       className={`${
         fullScreen ? "fixed inset-0" : "w-full h-full"
-      } bg-[hsl(133,43%,92%)] flex items-center justify-center z-50`}
+      } flex items-center justify-center z-50`}
     >
       <div className="flex flex-col items-center space-y-8">
         {/* Bicycle Wheel Animation */}

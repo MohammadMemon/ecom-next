@@ -27,6 +27,7 @@ import useCartStore from "@/store/cartStore";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import useRecentlyViewedStore from "@/store/recentlyViewedStore";
+import Loader from "@/components/ui/loader";
 
 export default function ProductDetails({ product }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -182,7 +183,6 @@ export default function ProductDetails({ product }) {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {/* Image Section */}
           <div className="space-y-4">
-            {/* Main Image Carousel */}
             <div className="relative">
               <Carousel
                 plugins={[plugin.current]}
@@ -196,14 +196,33 @@ export default function ProductDetails({ product }) {
                     <CarouselItem key={index}>
                       <Card className="border-0 shadow-lg">
                         <CardContent className="p-0">
-                          <div className="overflow-hidden bg-white rounded-lg aspect-square">
-                            <Image
-                              width={1000}
-                              height={1000}
-                              src={image.url || "/fallback-image.jpg"}
-                              alt={image.alt || product.name}
-                              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-                            />
+                          <div className="overflow-hidden rounded-lg bg aspect-square">
+                            {(() => {
+                              const [loaded, setLoaded] = useState(false);
+
+                              return (
+                                <div className="relative w-full h-full">
+                                  {!loaded && (
+                                    <div className="absolute inset-0 z-10 flex items-center justify-center ">
+                                      <div className="flex items-center justify-center min-h-[8rem] w-full">
+                                        <Loader fullScreen={false} />
+                                      </div>
+                                    </div>
+                                  )}
+                                  <Image
+                                    width={1000}
+                                    height={1000}
+                                    src={image.url || "/fallback-image.jpg"}
+                                    alt={image.alt || product.name}
+                                    onLoad={() => setLoaded(true)}
+                                    onError={() => setLoaded(true)}
+                                    className={`object-cover w-full h-full transition-transform duration-300 hover:scale-105 ${
+                                      loaded ? "opacity-100" : "opacity-0"
+                                    }`}
+                                  />
+                                </div>
+                              );
+                            })()}
                           </div>
                         </CardContent>
                       </Card>

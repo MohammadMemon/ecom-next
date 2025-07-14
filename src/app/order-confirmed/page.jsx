@@ -11,6 +11,7 @@ import {
   Share2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/loader";
 
 export default function OrderConfirmed() {
   const [orderData, setOrderData] = useState(null);

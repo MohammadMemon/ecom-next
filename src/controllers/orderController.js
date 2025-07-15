@@ -60,7 +60,7 @@ export const newOrder = async (body) => {
 
 // get Single Order
 export const getSingleOrder = async (id) => {
-  const order = await Order.findById(id).populate("user", "name email");
+  const order = await Order.findOne({ orderId: id });
 
   if (!order) {
     return {
@@ -77,8 +77,8 @@ export const getSingleOrder = async (id) => {
 };
 
 // get logged in user Orders
-export const myOrders = async (userId) => {
-  const orders = await Order.find({ user: userId });
+export const myOrders = async (userEmail) => {
+  const orders = await Order.find({ "user.userEmail": userEmail });
   return {
     success: true,
     orders,

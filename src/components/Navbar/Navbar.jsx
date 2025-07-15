@@ -478,7 +478,7 @@ const Navbar = () => {
             <div className="flex items-center space-x-4">
               <SearchModal />
               <Link
-                href="/auth/authtest"
+                href="/account"
                 className="hover:text-[#02D866] transition-colors"
               >
                 <User className="w-6 h-6" />

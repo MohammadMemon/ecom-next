@@ -23,7 +23,6 @@ const footerLinks = [
     title: "Quick Links",
     links: [
       { text: "Home", href: "/" },
-      { text: "Products", href: "/products" },
       { text: "Orders", href: "/account/orders" },
       { text: "Cart", href: "/cart" },
     ],
@@ -33,7 +32,7 @@ const footerLinks = [
     links: [
       { text: "About Us", href: "/about-us" },
       { text: "Contact Us", href: "/contact-us" },
-      { text: "Categories", href: "/categories" },
+      { text: "Categories", href: "/category" },
     ],
   },
 ];

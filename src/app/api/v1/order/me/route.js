@@ -1,33 +1,31 @@
 import dbConnect from "@/lib/dbConnect";
 import { myOrders } from "@/controllers/orderController";
 import { NextResponse } from "next/server";
-
-//Auth needed
+import { adminAuth } from "@/firebase/admin";
 
 export async function GET(req) {
   await dbConnect();
+
   const authHeader = req.headers.get("authorization");
-  const token = authHeader?.split("Bearer ")[1];
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json(
-      { success: false, message: "No token provided" },
+      { success: false, message: "Unauthorized: No token provided" },
       { status: 401 }
     );
   }
 
-  // Pass token to getUser
+  const idToken = authHeader.split("Bearer ")[1];
 
-  const userId = data.user.id;
-  const response = await myOrders(userId);
-  if (response.success) {
-    return NextResponse.json(response, { status: 201 });
-  } else {
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    const userEmail = decodedToken.email;
+
+    const response = await myOrders(userEmail);
+    return NextResponse.json(response, { status: 200 });
+  } catch (error) {
     return NextResponse.json(
-      {
-        success: false,
-        message: response.message,
-      },
-      { status: response.statusCode || 500 }
+      { success: false, message: "Unauthorized: Invalid token" },
+      { status: 401 }
     );
   }
 }

@@ -205,7 +205,7 @@ export function SignupForm({ className, ...props }) {
         }
       }
 
-      router.push("/auth/authtest");
+      router.push("/account");
     } catch (error) {
       console.error("Google login failed:", error);
 

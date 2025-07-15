@@ -61,7 +61,7 @@ export function LoginForm({ className, ...props }) {
 
       console.log("Logged in successfully:", user.uid);
 
-      router.push("/auth/authtest");
+      router.push("/account");
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
@@ -118,7 +118,7 @@ export function LoginForm({ className, ...props }) {
         });
       }
 
-      router.push("/auth/authtest");
+      router.push("/account");
     } catch (error) {
       console.error("Login failed:", error);
       toast({

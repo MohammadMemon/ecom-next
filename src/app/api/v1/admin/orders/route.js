@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import { getAllOrders, myOrders } from "@/controllers/orderController";
+import { getAllOrders } from "@/controllers/orderController";
 import { NextResponse } from "next/server";
 
 export async function GET() {

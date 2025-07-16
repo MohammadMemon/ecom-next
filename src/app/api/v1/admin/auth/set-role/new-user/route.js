@@ -15,9 +15,13 @@ export async function POST(request) {
     // Verify token
     const decodedToken = await adminAuth.verifyIdToken(idToken);
 
-    // Only set role if token is valid and matches UID
-    if (decodedToken.uid === uid) {
-      await adminAuth.setCustomUserClaims(uid, { role: "user" });
+    try {
+      if (decodedToken.uid === uid) {
+        await adminAuth.setCustomUserClaims(uid, { role: "user" });
+      }
+      console.log("Role set successfully");
+    } catch (error) {
+      console.log(error);
     }
 
     return NextResponse.json({

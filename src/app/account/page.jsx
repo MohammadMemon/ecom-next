@@ -24,6 +24,7 @@ import {
   ShoppingCart,
   Edit,
   Eye,
+  LayoutDashboard,
 } from "lucide-react";
 import Loader from "@/components/ui/loader";
 import Image from "next/image";
@@ -49,7 +50,8 @@ export default function ProfilePage() {
       } else {
         // Get custom claims
         const idTokenResult = await user.getIdTokenResult();
-        const role = idTokenResult.claims.role || "user";
+        const role = idTokenResult.claims.role;
+        console.log(idTokenResult);
         setUser({
           ...user,
           role,
@@ -63,6 +65,7 @@ export default function ProfilePage() {
     return () => unsubscribe();
   }, []);
 
+  user ? console.log("User Role", user) : "";
   const fetchOrders = async (user) => {
     try {
       const token = await user.getIdToken();
@@ -232,16 +235,6 @@ export default function ProfilePage() {
                       <p className="font-medium">{user.phone}</p>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-4 h-4 text-slate-500" />
-                    <div>
-                      <p className="text-sm text-slate-500">Account Role</p>
-                      <Badge variant="outline" className="capitalize">
-                        {user.role}
-                      </Badge>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -310,6 +303,16 @@ export default function ProfilePage() {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {user.role === "admin" ? (
+                  <Button
+                    onClick={() => router.push("/admin")}
+                    className="justify-start w-full text-white bg-green-800"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-2" /> Admin Dashboard
+                  </Button>
+                ) : (
+                  ""
+                )}
                 <Button
                   onClick={() => router.push("/")}
                   className="justify-start w-full"

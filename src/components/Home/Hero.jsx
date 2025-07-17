@@ -93,6 +93,7 @@ const Hero = () => {
                 width={1200}
                 height={900}
                 className="object-cover w-full h-full rounded-lg"
+                priority
               />
             </SwiperSlide>
             <SwiperSlide>

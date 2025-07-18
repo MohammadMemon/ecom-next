@@ -12,11 +12,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/ui/loader";
+import { useRouter } from "next/navigation";
 
 export default function OrderConfirmed() {
   const [orderData, setOrderData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Get order data from sessionStorage
@@ -51,6 +53,9 @@ export default function OrderConfirmed() {
         url: window.location.href,
       });
     }
+  };
+  const handleOrderDetails = () => {
+    router.push(`/account/orders/${orderData.orderId}`);
   };
 
   if (loading) {
@@ -160,6 +165,12 @@ export default function OrderConfirmed() {
                   >
                     <Share2 className="w-4 h-4" />
                     Share
+                  </Button>
+                  <Button
+                    onClick={handleOrderDetails}
+                    className="flex items-center gap-2 px-4 py-2 duration-200 rounded-lg "
+                  >
+                    See Order Details{" "}
                   </Button>
                 </div>
               </div>

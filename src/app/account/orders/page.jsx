@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAuth } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShoppingBag, Package, ArrowLeft, ShoppingCart } from "lucide-react";
+import { ShoppingBag, Package, ShoppingCart } from "lucide-react";
 import Loader from "@/components/ui/loader";
 import { OrderCard } from "@/components/ui/OrderCard";
 import { auth } from "@/firebase/client";

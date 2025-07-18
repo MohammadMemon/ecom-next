@@ -10,12 +10,10 @@ import {
   MapPin,
   Phone,
   Mail,
-  Share2,
   Calendar,
   Clock,
   CheckCircle,
   Receipt,
-  MessageCircle,
 } from "lucide-react";
 import Loader from "@/components/ui/loader";
 import Image from "next/image";

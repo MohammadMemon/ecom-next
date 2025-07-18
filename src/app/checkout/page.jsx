@@ -223,19 +223,23 @@ export default function CheckoutPage() {
                         required
                       />
                     </div>
-                    <div>
-                      <label className="block mb-2 text-sm font-medium">
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
-                      />
-                    </div>
+                    {!user ? (
+                      <div>
+                        <label className="block mb-2 text-sm font-medium">
+                          Email *
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                          required
+                        />
+                      </div>
+                    ) : (
+                      ""
+                    )}
                     <div>
                       <label className="block mb-2 text-sm font-medium">
                         Phone Number *

@@ -32,6 +32,10 @@ export async function middleware(request) {
         return NextResponse.redirect(new URL("/unauthorized", request.url));
       }
 
+      if (pathname.startsWith("/dashboard") && decodedToken.role !== "admin") {
+        return NextResponse.redirect(new URL("/unauthorized", request.url));
+      }
+
       return NextResponse.next({
         request: {
           headers: new Headers({
@@ -53,7 +57,7 @@ export async function middleware(request) {
         pathname.startsWith("/dashboard") ||
         pathname.startsWith("/account")
       ) {
-        return NextResponse.redirect(new URL("/login", request.url));
+        return NextResponse.redirect(new URL("/auth/login", request.url));
       }
 
       return NextResponse.next();
@@ -64,7 +68,7 @@ export async function middleware(request) {
       console.log("💥 Middleware error:", error);
       console.log("📍 Error on:", pathname);
 
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL("/auth/login", request.url));
     },
   });
 }

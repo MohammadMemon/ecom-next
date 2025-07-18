@@ -106,6 +106,8 @@ export function LoginForm({ className, ...props }) {
 
       const isNewUser = result._tokenResponse?.isNewUser || false;
 
+      console.log(isNewUser);
+
       if (isNewUser) {
         const idToken = await user.getIdToken();
         await fetch("/api/v1/admin/auth/set-role/new-user", {

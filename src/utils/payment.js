@@ -185,6 +185,7 @@ const handlePaymentSuccess = async (
       name: item.name,
       price: item.price,
       quantity: item.quantity,
+      sku: item.sku,
       image: item.images[0]?.url || "",
       product: item._id,
       categorySlug: item.categorySlug,

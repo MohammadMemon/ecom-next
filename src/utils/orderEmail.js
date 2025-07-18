@@ -58,7 +58,7 @@ const emailTemplates = {
             
             <p style="color: #666;">
               Best regards,<br>
-              ${data.businessName}
+              CycleDaddy
             </p>
           </div>
         </div>
@@ -89,7 +89,7 @@ const emailTemplates = {
         You will receive another email when your order is shipped.
         
         Best regards,
-        ${data.businessName}
+        CycleDaddy
       `,
     }),
 
@@ -131,7 +131,7 @@ const emailTemplates = {
             }
 
             <p style="color: #666;">
-              Thank you for choosing ${data.businessName}!
+              Thank you for choosing CycleDaddy!
             </p>
           </div>
         </div>
@@ -157,7 +157,7 @@ const emailTemplates = {
         
         ${data.trackingUrl ? `Track your order: ${data.trackingUrl}` : ""}
         
-        Thank you for choosing ${data.businessName}!
+        Thank you for choosing CycleDaddy!
       `,
     }),
 
@@ -180,7 +180,7 @@ const emailTemplates = {
             </p>
             
             <p style="color: #666;">
-              Thank you for choosing ${data.businessName}!
+              Thank you for choosing CycleDaddy!
             </p>
           </div>
         </div>
@@ -197,7 +197,7 @@ const emailTemplates = {
         
         We hope you're satisfied with your purchase.
         
-        Thank you for choosing ${data.businessName}!
+        Thank you for choosing CycleDaddy!
       `,
     }),
 
@@ -208,7 +208,7 @@ const emailTemplates = {
           <h1 style="color: #333; text-align: center;">Order Cancelled</h1>
           <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h2 style="color: #555;">Hello ${data.customerName},</h2>
-            <p>Your order has been cancelled as requested.</p>
+            <p>We would like to inform you that your order has been cancelled, either as requested or due to stock restrictions.</p>
             
             <div style="background: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p><strong>Order ID:</strong> ${data.orderId}</p>
@@ -238,7 +238,7 @@ const emailTemplates = {
         
         Hello ${data.customerName},
         
-        Your order has been cancelled as requested.
+        We would like to inform you that your order has been cancelled, either as requested or due to stock restrictions.
         
         Order ID: ${data.orderId}
         Cancelled On: ${new Date().toLocaleDateString()}
@@ -343,19 +343,18 @@ const emailTemplates = {
           )
           .join("\n")}
         
-        ACTION REQUIRED: Please process this order and update the inventory.
+        ACTION REQUIRED: Please process this order.
       `,
     }),
   },
 };
 
-// Create transporter with retry logic and better deliverability settings
 function createTransporter() {
   return nodeMailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    service: process.env.SMTP_SERVICE,
-    secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
+    port: parseInt(process.env.SMTP_PORT, 10),
+    secure: process.env.SMTP_PORT === "465",
     auth: {
       user: process.env.SMTP_MAIL,
       pass: process.env.SMTP_PASSWORD,
@@ -366,7 +365,7 @@ function createTransporter() {
     rateDelta: 1000,
     rateLimit: 5,
     tls: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: true,
       ciphers: "SSLv3",
     },
   });
@@ -512,6 +511,7 @@ export async function sendOrderStatusUpdate(status, orderData) {
 
   try {
     const templateName = statusTemplateMap[status];
+    console.log(orderData.customerEmail);
     const customerResult = await sendCustomerNotification(
       templateName,
       orderData

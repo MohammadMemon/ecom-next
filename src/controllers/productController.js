@@ -218,6 +218,9 @@ export const updateProductStock = async (productId, quantity) => {
       product.status = "out-of-stock";
     }
 
+    // Update sold
+    product.sold = (product.sold || 0) + quantity;
+
     await product.save();
 
     console.log(

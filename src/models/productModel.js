@@ -11,6 +11,11 @@ const productSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+  sold: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
   images: [
     {
       public_id: {

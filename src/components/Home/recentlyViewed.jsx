@@ -8,7 +8,6 @@ import Loader from "../ui/loader";
 export default function RecentlyViewed() {
   const [loading, setLoading] = useState(true);
 
-  // Subscribe to the store directly
   const products = useRecentlyViewedStore((state) => state.products);
   const getProductsWithStock = useRecentlyViewedStore(
     (state) => state.getProductsWithStock
@@ -27,7 +26,7 @@ export default function RecentlyViewed() {
     };
 
     fetchProducts();
-  }, []); // Empty dependency array since we're subscribing to store changes
+  }, []);
 
   console.log("products:", products);
 

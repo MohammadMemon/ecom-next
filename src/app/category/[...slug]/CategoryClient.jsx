@@ -19,6 +19,14 @@ export default function CategoryClient({
     sort: "relevance",
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const getEffectiveStock = (product) => {
+    // If product has root stock, use it
+    if (product.stock > 0) return product.stock;
+
+    // Otherwise, calculate from variants
+    const allOptions = product.variants?.flatMap((v) => v.options || []) || [];
+    return allOptions.reduce((sum, opt) => sum + (opt.stock || 0), 0);
+  };
 
   // Calculate available filters
   const { brands, categories, minPriceRange, maxPriceRange } = useMemo(() => {
@@ -39,14 +47,39 @@ export default function CategoryClient({
         if (product.subSubCategory) categorySet.add(product.subSubCategory);
       }
 
-      if (product.price < minPrice) minPrice = product.price;
-      if (product.price > maxPrice) maxPrice = product.price;
+      // Get all prices from product (root price + all variant prices)
+      const prices = [];
+
+      // Add root price if it exists
+      if (typeof product.price === "number" && product.price > 0) {
+        prices.push(product.price);
+      }
+
+      // Add all variant prices
+      if (product.variants?.length > 0) {
+        product.variants.forEach((variant) => {
+          if (variant.options?.length > 0) {
+            variant.options.forEach((option) => {
+              if (typeof option.price === "number" && option.price > 0) {
+                prices.push(option.price);
+              }
+            });
+          }
+        });
+      }
+
+      // Update min/max from all prices found
+      prices.forEach((price) => {
+        if (price < minPrice) minPrice = price;
+        if (price > maxPrice) maxPrice = price;
+      });
     });
 
     return {
       brands: Array.from(brandSet).sort(),
       categories: Array.from(categorySet).sort(),
-      minPriceRange: Math.floor(minPrice),
+      minPriceRange:
+        minPrice === Number.POSITIVE_INFINITY ? 0 : Math.floor(minPrice),
       maxPriceRange: Math.ceil(maxPrice),
     };
   }, [products, subCategorySlug, subSubCategorySlug]);
@@ -75,29 +108,58 @@ export default function CategoryClient({
     }
 
     // Apply price filter
-    result = result.filter(
-      (product) =>
-        product.price >= filters.minPrice && product.price <= filters.maxPrice
-    );
+    result = result.filter((product) => {
+      // Get price from variants if no root price
+      const effectivePrice =
+        typeof product.price === "number" && product.price > 0
+          ? product.price
+          : product.variants?.flatMap((v) => v.options || [])?.[0]?.price ?? 0;
 
-    // Apply in-stock filter
+      return (
+        effectivePrice >= filters.minPrice && effectivePrice <= filters.maxPrice
+      );
+    });
+
+    // Apply in-stock filter - FIXED to check variants too
     if (filters.inStock) {
-      result = result.filter((product) => product.stock > 0);
+      result = result.filter((product) => getEffectiveStock(product) > 0);
     }
 
     // Apply sorting
     switch (filters.sort) {
       case "price_asc":
-        return [...result].sort((a, b) => a.price - b.price);
+        return [...result].sort((a, b) => {
+          const priceA =
+            a.price ||
+            a.variants?.flatMap((v) => v.options || [])?.[0]?.price ||
+            0;
+          const priceB =
+            b.price ||
+            b.variants?.flatMap((v) => v.options || [])?.[0]?.price ||
+            0;
+          return priceA - priceB;
+        });
       case "price_desc":
-        return [...result].sort((a, b) => b.price - a.price);
+        return [...result].sort((a, b) => {
+          const priceA =
+            a.price ||
+            a.variants?.flatMap((v) => v.options || [])?.[0]?.price ||
+            0;
+          const priceB =
+            b.price ||
+            b.variants?.flatMap((v) => v.options || [])?.[0]?.price ||
+            0;
+          return priceB - priceA;
+        });
       case "newest":
         return [...result].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
       case "in_stock_first":
-        return [...result].sort((a, b) => b.stock - a.stock);
-      default: // relevance
+        return [...result].sort(
+          (a, b) => getEffectiveStock(b) - getEffectiveStock(a)
+        );
+      default:
         return result;
     }
   }, [products, filters, subCategorySlug, subSubCategorySlug]);
@@ -147,10 +209,24 @@ export default function CategoryClient({
 
   const handleFilterChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+
+    setFilters((prev) => {
+      let newValue = type === "checkbox" ? checked : value;
+
+      // Handle price validation
+      if (name === "minPrice") {
+        const numValue = Number(value);
+        newValue = Math.max(minPriceRange, Math.min(numValue, prev.maxPrice));
+      } else if (name === "maxPrice") {
+        const numValue = Number(value);
+        newValue = Math.min(maxPriceRange, Math.max(numValue, prev.minPrice));
+      }
+
+      return {
+        ...prev,
+        [name]: newValue,
+      };
+    });
   };
 
   const clearFilters = () => {
@@ -193,6 +269,8 @@ export default function CategoryClient({
         <label className="block mb-1 text-sm font-medium text-gray-700">
           Price Range: ₹{filters.minPrice} - ₹{filters.maxPrice}
         </label>
+
+        {/* Number Inputs */}
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="text-xs text-gray-500">Min</label>
@@ -201,7 +279,8 @@ export default function CategoryClient({
               name="minPrice"
               value={filters.minPrice}
               onChange={handleFilterChange}
-              min={0}
+              min={minPriceRange}
+              max={filters.maxPrice}
               className="w-full p-2 border border-gray-300 rounded focus:ring-[#02D866] focus:border-[#02D866]"
             />
           </div>
@@ -212,27 +291,38 @@ export default function CategoryClient({
               name="maxPrice"
               value={filters.maxPrice}
               onChange={handleFilterChange}
+              min={filters.minPrice}
               max={maxPriceRange}
               className="w-full p-2 border border-gray-300 rounded focus:ring-[#02D866] focus:border-[#02D866]"
             />
           </div>
         </div>
-        <div className="flex items-center mt-2 space-x-2">
-          <span className="text-xs text-gray-500">₹{minPriceRange}</span>
-          <input
-            type="range"
-            min={minPriceRange}
-            max={maxPriceRange}
-            value={filters.maxPrice}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                maxPrice: Number.parseInt(e.target.value),
-              }))
-            }
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#02D866]"
-          />
-          <span className="text-xs text-gray-500">₹{maxPriceRange}</span>
+
+        {/* Single Range Slider for Max Price */}
+        <div className="mt-3">
+          <label className="block mb-1 text-xs text-gray-500">
+            Adjust Max Price
+          </label>
+          <div className="flex items-center space-x-2">
+            <span className="text-xs text-gray-500">₹{minPriceRange}</span>
+            <input
+              type="range"
+              min={minPriceRange}
+              max={maxPriceRange}
+              value={filters.maxPrice}
+              onChange={(e) => {
+                const value = Number.parseInt(e.target.value);
+                setFilters((prev) => ({
+                  ...prev,
+                  maxPrice: value,
+                  // Ensure minPrice doesn't exceed maxPrice
+                  minPrice: Math.min(prev.minPrice, value),
+                }));
+              }}
+              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#02D866]"
+            />
+            <span className="text-xs text-gray-500">₹{maxPriceRange}</span>
+          </div>
         </div>
       </div>
 

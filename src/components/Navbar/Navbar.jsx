@@ -398,12 +398,7 @@ const Navbar = () => {
                   width="50"
                   srcSet="/icon-light.png"
                 />
-                <Image
-                  src="/cycledaddy3.png"
-                  alt="Logo"
-                  width={200}
-                  height={100}
-                />
+                <Image src="/logo.png" alt="Logo" width={200} height={100} />
               </picture>
             </Link>
 

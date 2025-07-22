@@ -81,7 +81,7 @@ export default function SearchModal() {
         onClick={() => setIsOpen(true)}
         className="hover:text-[#02D866] transition-colors"
       >
-        <Search className="w-6 h-6" />
+        <Search aria-label="Search Items" className="w-6 h-6" />
       </button>
 
       {isOpen && (

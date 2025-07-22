@@ -41,7 +41,7 @@ export default function ClientNewArrivals({ products }) {
   return (
     <div
       id="Latest"
-      className="container w-[95vw] px-0 xs:w-[90vw] xs:p-3 sm:w-[75vw] sm:p-6 mx-auto"
+      className="container scroll-mt-[80px] w-[95vw] px-0 xs:w-[90vw] xs:p-3 sm:w-[75vw] sm:p-6 mx-auto"
     >
       <h1 className="mb-6 text-2xl font-bold text-center">New Arrivals</h1>
       <div className="grid w-full grid-cols-2 gap-2 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

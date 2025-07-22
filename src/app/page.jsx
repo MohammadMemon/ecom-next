@@ -30,11 +30,10 @@ export default function Home() {
       <div className="w-full py-4 mx-4 max-w-[95vw]">
         <Image
           src="/Banner1.png"
-          alt="Slide 2"
+          alt="Promotional Banner"
           width={1200}
           height={900}
           className="object-cover w-full rounded-lg"
-          priority
         />
       </div>
       <FeatureSection />

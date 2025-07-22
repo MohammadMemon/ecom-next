@@ -38,18 +38,22 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-primary-foreground flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary-foreground`}
       >
-        <Navbar />
-        <Suspense>
-          <main className="flex-1 pt-[80px]">{children}</main>
-        </Suspense>
-        <Toaster />
-        <SpeedInsights />
-        <Analytics />
-        <Footer />
+        <div className="layout-container">
+          <Navbar />
+          <main className="flex-1 pt-[80px]">
+            <Suspense fallback={<div className="min-h-[100vh]" />}>
+              {children}
+            </Suspense>
+          </main>
+          <Footer />
+          <Toaster />
+          <SpeedInsights />
+          <Analytics />
+        </div>
       </body>
     </html>
   );

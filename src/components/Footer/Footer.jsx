@@ -51,6 +51,7 @@ export default function Footer() {
           <div className="flex gap-4">
             <a
               href="https://www.instagram.com/cycledaddy.in/"
+              aria-label="Visit our Instagram page"
               target="_blank"
               className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
             >
@@ -58,6 +59,7 @@ export default function Footer() {
             </a>
             <a
               href="https://www.youtube.com/@cycledaddy6477"
+              aria-label="Visit our Youtube page"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
@@ -66,6 +68,7 @@ export default function Footer() {
             </a>
             <a
               href="https://www.facebook.com/share/16jStX9Bu8/?mibextid=qi2Omg"
+              aria-label="Visit our Facebook page"
               target="_blank"
               className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
             >
@@ -73,6 +76,7 @@ export default function Footer() {
             </a>
             <a
               href="https://www.linkedin.com/company/cycle-daddy"
+              aria-label="Visit our LinkedIn page"
               target="_blank"
               className="p-2 border border-black rounded-full bg-primary hover:bg-white hover:border-[#02D866] group"
             >

@@ -33,13 +33,13 @@ const Hero = () => {
   }, [words.length]);
 
   const images = [
-    { src: "/1.jpg", alt: "Hero Banner" },
-    { src: "/2.jpg", alt: "Premium Cycling Components" },
-    { src: "/3.jpg", alt: "Professional Bike Parts" },
-    { src: "/4.jpg", alt: "High-Quality Accessories" },
-    { src: "/5.jpg", alt: "Precision Engineering" },
-    { src: "/6.jpg", alt: "Elite Performance Gear" },
-    { src: "/7.jpg", alt: "Professional Equipment" },
+    { src: "/1.webp", alt: "Hero Banner" },
+    { src: "/2.webp", alt: "Premium Cycling Components" },
+    { src: "/3.webp", alt: "Professional Bike Parts" },
+    { src: "/4.webp", alt: "High-Quality Accessories" },
+    { src: "/5.webp", alt: "Precision Engineering" },
+    { src: "/6.webp", alt: "Elite Performance Gear" },
+    { src: "/7.webp", alt: "Professional Equipment" },
   ];
 
   return (
@@ -98,14 +98,13 @@ const Hero = () => {
                       <Image
                         src={image.src}
                         alt={image.alt}
-                        width={1200}
-                        height={900}
+                        width={index === 0 ? 1200 : 800}
+                        height={index === 0 ? 900 : 600}
                         priority={index === 0}
                         loading={index === 0 ? "eager" : "lazy"}
-                        fetchPriority={index === 0 ? "high" : "auto"}
-                        sizes="(max-width: 768px) 90vw, 50vw"
                         className="object-cover w-full h-full rounded-lg"
-                        quality={index === 0 ? 90 : 75}
+                        quality={index === 0 ? 80 : 70}
+                        sizes="(max-width: 768px) 100vw, 50vw"
                       />
                     </div>
                   </div>

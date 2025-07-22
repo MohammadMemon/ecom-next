@@ -388,24 +388,33 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 z-50 w-full ">
       {/* Main Navbar */}
-      <div className="mx-4 my-2 font-bold text-black border rounded-lg shadow-lg backdrop-blur-md bg-white/30 ">
+      <div className="mx-4 my-2 font-bold text-black border rounded-lg shadow-lg backdrop-blur-md bg-white/30">
         <div className="px-4 mx-auto max-w-7xl">
           <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex-shrink-0 text-xl font-bold">
+            {/* Logo Link */}
+            <Link
+              href="/"
+              className="flex-shrink-0 text-xl font-bold"
+              aria-label="Go to homepage"
+            >
               <picture>
                 <source
                   media="(max-width: 430px)"
                   width="50"
                   srcSet="/icon-light.png"
                 />
-                <Image src="/logo.png" alt="Logo" width={200} height={100} />
+                <Image
+                  src="/logo.png"
+                  alt="CycleDaddy Logo"
+                  width={200}
+                  height={100}
+                />
               </picture>
             </Link>
 
             {/* Desktop Navigation */}
             <div className="items-center hidden space-x-8 custom:flex">
               {categories.map((category, index) => {
-                // Check if this is one of the last few items that might overflow
                 const isRightAligned = index >= categories.length - 1;
 
                 return (
@@ -416,7 +425,8 @@ const Navbar = () => {
                     >
                       {category.name}
                     </Link>
-                    {/* Desktop Dropdown */}
+
+                    {/* Dropdown */}
                     <div
                       className={`absolute mt-2 w-48 transition-all opacity-0 invisible group-hover:visible group-hover:opacity-100 ${
                         isRightAligned ? "right-0" : "left-0"
@@ -435,7 +445,8 @@ const Navbar = () => {
                               >
                                 {subCategories.name}
                               </Link>
-                              {/* Desktop Sub-Dropdown */}
+
+                              {/* Sub-Sub-Dropdown */}
                               <div
                                 className={`absolute top-0 w-48 transition-all opacity-0 invisible group-hover/sub:visible group-hover/sub:opacity-100 ${
                                   isRightAligned
@@ -469,17 +480,21 @@ const Navbar = () => {
               })}
             </div>
 
-            {/* Icons */}
+            {/* Right-side Icons */}
             <div className="flex items-center space-x-4">
               <SearchModal />
+
               <Link
                 href="/account"
+                aria-label="Go to your account"
                 className="hover:text-[#02D866] transition-colors"
               >
                 <User className="w-6 h-6" />
               </Link>
+
               <Link
                 href="/cart"
+                aria-label="View cart"
                 className="relative hover:text-[#02D866] transition-colors"
               >
                 <ShoppingCart className="w-6 h-6" />
@@ -489,12 +504,14 @@ const Navbar = () => {
                   </span>
                 ) : null}
               </Link>
-              {/* Mobile menu button */}
+
+              {/* Mobile Menu Toggle */}
               <button
                 className="custom:hidden hover:text-[#02D866] transition-colors"
                 onClick={() => setIsOpen(true)}
+                aria-label="Open mobile menu"
               >
-                <Menu className="w-6 h-6 " />
+                <Menu className="w-6 h-6" />
               </button>
             </div>
           </div>

@@ -45,7 +45,7 @@ export default function Home() {
 
       <div className="w-full py-4 mx-4 max-w-[95vw]">
         <Image
-          src="/Banner4.png"
+          src="/Banner1.png"
           alt="Promotional Banner"
           width={1000}
           height={200}

@@ -19,6 +19,7 @@ import {
   BarChart3,
   ArrowUp,
   Star,
+  ArrowDown,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {

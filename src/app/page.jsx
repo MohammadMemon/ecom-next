@@ -7,6 +7,7 @@ import RecentlyViewedWrapper from "@/components/Home/RecentlyViewedWrapper";
 import FeatureSection from "@/components/Home/FeatureSection";
 
 import CategoryCarousel from "@/components/Home/CategoryCaroousel";
+import FaqPage from "./faq/page";
 
 export const fetchCache = "force-cache";
 
@@ -33,6 +34,8 @@ export default function Home() {
 
       <RecentlyViewedWrapper />
 
+      <CategoryCarousel />
+      <FeatureSection />
       <Suspense
         fallback={
           <div className="h-[400px] w-full flex items-center justify-center">
@@ -42,7 +45,6 @@ export default function Home() {
       >
         <NewArrivals />
       </Suspense>
-
       <div className="w-full py-4 mx-4 max-w-[95vw]">
         <Image
           src="/Banner1.png"
@@ -51,9 +53,9 @@ export default function Home() {
           height={200}
           className="object-cover w-full rounded-lg"
         />
+
+        <FaqPage />
       </div>
-      <CategoryCarousel />
-      <FeatureSection />
     </div>
   );
 }

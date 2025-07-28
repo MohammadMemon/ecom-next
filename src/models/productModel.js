@@ -121,6 +121,8 @@ const productSchema = new mongoose.Schema({
   scrapeInfo: {
     scrapedAt: String,
     scrapedUrl: String,
+    lastStockCheck: String,
+    stockCheckStatus: String,
   },
 });
 

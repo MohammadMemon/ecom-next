@@ -1,3 +1,7 @@
-export default function category() {
-  return <p>this is category page</p>;
+"use client";
+
+import CategoryPage from "@/components/Product/CategoryPage";
+
+export default function Page() {
+  return <CategoryPage />;
 }

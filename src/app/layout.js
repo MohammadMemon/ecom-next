@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto, Geist, Geist_Mono, Poppins } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../styles/globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,16 +7,11 @@ import Footer from "@/components/Footer/Footer";
 import { Analytics } from "@vercel/analytics/next";
 import { Suspense } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-rajdhani",
   subsets: ["latin"],
   display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export async function generateMetadata({ params }) {
@@ -137,12 +132,6 @@ export default function RootLayout({ children }) {
     <html lang="en-IN" className="h-full">
       <head>
         <link rel="preload" href="/1.webp" as="image" fetchPriority="high" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -151,7 +140,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary-foreground`}
+        className={`${poppins.variable}  antialiased bg-primary-foreground`}
       >
         <div className="layout-container">
           <Navbar />

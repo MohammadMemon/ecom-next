@@ -102,7 +102,7 @@ export function SignupForm({ className, ...props }) {
       }
 
       // Assign default role (e.g., "user") via custom API
-      const roleResponse = await fetch("/api/v1/admin/auth/set-role/new-user", {
+      const roleResponse = await fetch("/api/v1/auth/set-role/new-user", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${idToken}`,
@@ -188,7 +188,7 @@ export function SignupForm({ className, ...props }) {
           const idToken = await user.getIdToken();
           console.log("Setting user role for Google signup...");
 
-          const response = await fetch("/api/v1/admin/auth/set-role/new-user", {
+          const response = await fetch("/api/v1/auth/set-role/new-user", {
             method: "POST",
             headers: {
               Authorization: `Bearer ${idToken}`,

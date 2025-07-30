@@ -110,7 +110,7 @@ export function LoginForm({ className, ...props }) {
 
       if (isNewUser) {
         const idToken = await user.getIdToken();
-        await fetch("/api/v1/admin/auth/set-role/new-user", {
+        await fetch("/api/v1/auth/set-role/new-user", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${idToken}`,

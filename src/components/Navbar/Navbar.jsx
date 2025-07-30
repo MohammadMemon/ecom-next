@@ -396,6 +396,7 @@ const Navbar = () => {
               href="/"
               className="flex-shrink-0 text-xl font-bold"
               aria-label="Go to homepage"
+              prefetch={false}
             >
               <picture>
                 <source
@@ -422,6 +423,7 @@ const Navbar = () => {
                     <Link
                       href={category.href}
                       className="hover:text-[#02D866] text-m drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)] transition-colors py-2"
+                      prefetch={false}
                     >
                       {category.name}
                     </Link>
@@ -441,6 +443,7 @@ const Navbar = () => {
                             >
                               <Link
                                 href={subCategories.href}
+                                prefetch={false}
                                 className="block px-4 py-2 text-gray-200 hover:text-[#02D866] transition-colors"
                               >
                                 {subCategories.name}
@@ -461,6 +464,7 @@ const Navbar = () => {
                                         <Link
                                           key={subSub.name}
                                           href={subSub.href}
+                                          prefetch={false}
                                           className="block px-4 py-2 text-gray-200 hover:text-[#02D866] transition-colors"
                                         >
                                           {subSub.name}
@@ -488,12 +492,14 @@ const Navbar = () => {
                 href="/account"
                 aria-label="Go to your account"
                 className="hover:text-[#02D866] transition-colors"
+                prefetch={false}
               >
                 <User className="w-6 h-6" />
               </Link>
 
               <Link
                 href="/cart"
+                prefetch={false}
                 aria-label="View cart"
                 className="relative hover:text-[#02D866] transition-colors"
               >
@@ -554,6 +560,7 @@ const Navbar = () => {
                       href={category.href}
                       className="flex-grow text-gray-100 hover:text-[#02D866] transition-colors"
                       onClick={closeMenu}
+                      prefetch={false}
                     >
                       {category.name}
                     </Link>
@@ -579,6 +586,7 @@ const Navbar = () => {
                               <Link
                                 href={subCategories.href}
                                 className="flex-grow text-gray-200 hover:text-[#02D866] transition-colors"
+                                prefetch={false}
                                 onClick={closeMenu}
                               >
                                 {subCategories.name}
@@ -606,6 +614,7 @@ const Navbar = () => {
                                         key={subSub.name}
                                         href={subSub.href}
                                         className="block px-4 py-2 border-t border-[#100c0c] text-[#100c0c] hover:text-[#02D866] transition-colors"
+                                        prefetch={false}
                                         onClick={closeMenu}
                                       >
                                         {subSub.name}
@@ -625,6 +634,7 @@ const Navbar = () => {
               <div className="px-4 mt-4 space-y-2">
                 <Link
                   href="/account"
+                  prefetch={false}
                   className="flex items-center space-x-2 text-gray-200 hover:text-[#02D866] transition-colors py-2"
                   onClick={closeMenu}
                 >

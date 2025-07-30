@@ -99,6 +99,7 @@ export default function Footer() {
                     <li key={link.text}>
                       <Link
                         href={link.href}
+                        prefetch={false}
                         className="text-gray-700 hover:text-[#02D866] text-base sm:text-lg"
                       >
                         {link.text}

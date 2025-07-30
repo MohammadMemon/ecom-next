@@ -36,21 +36,12 @@ async function getProductsData(slugParts) {
 }
 
 export async function generateMetadata({ params }) {
-  await params;
-  const slugParts = params?.slug || [];
-  const lastSegment = slugParts[slugParts.length - 1] || "Bicycles";
-
-  const startTimeMetadata = process.hrtime.bigint();
+  const resolvedParams = await params;
+  const slugParts = resolvedParams?.slug || [];
+  const lastSegment = slugParts[slugParts.length - 1] || "Products";
 
   const data = await getProductsData(slugParts);
   const products = data.products || [];
-
-  const endTimeMetadata = process.hrtime.bigint();
-  const durationMetadataMs =
-    Number(endTimeMetadata - startTimeMetadata) / 1_000_000;
-  console.log(
-    `[Scenario A - generateMetadata] Fetch duration: ${durationMetadataMs}ms`
-  );
 
   let categoryLabelForTitle = lastSegment.replace(/-/g, " ");
   if (products.length > 0) {
@@ -118,7 +109,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function Page({ params }) {
-  const slugParts = params?.slug || [];
+  const resolvedParams = await params;
+  const slugParts = resolvedParams?.slug || [];
 
   const [categorySlug, subCategorySlug, subSubCategorySlug] = slugParts;
 
@@ -126,16 +118,8 @@ export default async function Page({ params }) {
     notFound();
   }
 
-  const startTimePage = process.hrtime.bigint();
-
   const data = await getProductsData(slugParts);
   const products = data.products || [];
-
-  const endTimePage = process.hrtime.bigint();
-  const durationPageMs = Number(endTimePage - startTimePage) / 1_000_000;
-  console.log(
-    `[Scenario A - Page component] Fetch duration: ${durationPageMs}ms`
-  );
 
   // const formattedIds = products.map((p) => `"${p._id}"`).join(",\n");
   // console.log(formattedIds);

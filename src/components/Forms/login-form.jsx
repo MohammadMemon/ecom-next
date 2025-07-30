@@ -78,6 +78,7 @@ export function LoginForm({ className, ...props }) {
       setLoading(false);
     }
   };
+
   const handleGoogleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -101,8 +102,6 @@ export function LoginForm({ className, ...props }) {
       if (!response.ok) {
         throw new Error("Failed to set auth cookies");
       }
-
-      router.refresh();
 
       const isNewUser = result._tokenResponse?.isNewUser || false;
 

@@ -1,10 +1,10 @@
-# Robots.txt for Ecommerce Application
-# Last updated: 2025-07-28
+# Robots.txt for CycleDaddy 
+# Last updated: 2025-07-30
 
 # Default rule for all robots
 User-agent: *
-# Allow crawling of main content
 Allow: /
+Allow: /_next/image
 Allow: /product/
 Allow: /category/
 Allow: /blog/
@@ -43,8 +43,9 @@ Disallow: /error/
 Disallow: /404/
 Disallow: /500/
 
-# Google Bot (most important for SEO)
+# Google Bot
 User-agent: Googlebot
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /category/
@@ -59,6 +60,7 @@ Crawl-delay: 1
 
 # Bing Bot
 User-agent: Bingbot
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /category/
@@ -71,26 +73,7 @@ Crawl-delay: 2
 
 # Yahoo Bot
 User-agent: Slurp
-Allow: /
-Allow: /product/
-Allow: /category/
-Disallow: /admin/
-Disallow: /checkout/
-Disallow: /cart/
-Crawl-delay: 3
-
-# Yandex Bot (Russian search engine)
-User-agent: YandexBot
-Allow: /
-Allow: /product/
-Allow: /category/
-Disallow: /admin/
-Disallow: /checkout/
-Disallow: /cart/
-Crawl-delay: 2
-
-# Baidu Bot 
-User-agent: Baiduspider
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /category/
@@ -101,6 +84,7 @@ Crawl-delay: 3
 
 # DuckDuckGo Bot
 User-agent: DuckDuckBot
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /category/
@@ -111,6 +95,7 @@ Crawl-delay: 2
 
 # Facebook Bot 
 User-agent: facebookexternalhit
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /blog/
@@ -120,6 +105,7 @@ Disallow: /account/
 
 # Twitter Bot 
 User-agent: Twitterbot
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /blog/
@@ -129,6 +115,7 @@ Disallow: /account/
 
 # LinkedIn Bot
 User-agent: LinkedInBot
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /blog/
@@ -139,6 +126,7 @@ Disallow: /account/
 
 # Pinterest Bot
 User-agent: Pinterest
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /category/
@@ -148,6 +136,7 @@ Disallow: /account/
 
 # WhatsApp Bot
 User-agent: WhatsApp
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Disallow: /admin/
@@ -156,6 +145,7 @@ Disallow: /account/
 
 # Telegram Bot
 User-agent: TelegramBot
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Disallow: /admin/
@@ -164,6 +154,7 @@ Disallow: /account/
 
 # Apple Bot
 User-agent: Applebot
+Allow: /_next/image
 Allow: /
 Allow: /product/
 Allow: /blog/
@@ -172,13 +163,17 @@ Disallow: /checkout/
 Disallow: /account/
 Crawl-delay: 1
 
+# Strictly limit aggressive crawlers and scrapers
 User-agent: AhrefsBot
+Disallow: /
 Crawl-delay: 10
 
 User-agent: SemrushBot
+Disallow: /
 Crawl-delay: 10
 
 User-agent: MJ12bot
+Disallow: /
 Crawl-delay: 10
 
 User-agent: DotBot
@@ -208,16 +203,9 @@ Disallow: /
 User-agent: ScrapeBot
 Disallow: /
 
-User-agent: AhrefsBot
-Disallow: /
-
 User-agent: MegaIndex
 Disallow: /
 
-User-agent: dotbot
-Disallow: /
-
-# Sitemap location
+# Sitemap and Host
 Sitemap: https://cycledaddy.in/sitemap.xml
-
 Host: cycledaddy.in

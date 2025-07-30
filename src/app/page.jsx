@@ -54,7 +54,7 @@ export default function Home() {
           className="object-cover w-full rounded-lg"
         />
         <div className="flex items-center justify-center min-h-screen">
-          <div className="max-w-[75vw] w-full">
+          <div className="max-w-[95vw] w-full">
             <FaqPage />
           </div>
         </div>

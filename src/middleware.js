@@ -72,7 +72,7 @@ export async function middleware(request) {
         pathname.startsWith("/auth/login") ||
         pathname.startsWith("/auth/signup")
       ) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(new URL("/account", request.url));
       }
 
       // Admin role checks
@@ -154,7 +154,7 @@ export async function middleware(request) {
 export const config = {
   matcher: [
     "/api/login",
-    "/api/signup",
+    "/api/logout",
     "/admin/:path*",
     "/account/:path*",
     "/dashboard/:path*",

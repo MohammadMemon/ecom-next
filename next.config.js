@@ -1,11 +1,6 @@
 module.exports = {
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-    ],
+    unoptimized: true, 
   },
   env: {
     GOOGLE_SEARCH_CONSOLE_KEY: process.env.GOOGLE_SEARCH_CONSOLE_KEY,

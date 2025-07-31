@@ -84,7 +84,7 @@ export async function generateMetadata({ params }) {
     alternates: { canonical: `/product/${params.id}` },
     openGraph,
     robots: {
-      index: product.status === "active",
+      index: true,
       follow: true,
     },
   };
